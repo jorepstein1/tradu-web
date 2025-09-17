@@ -1,8 +1,23 @@
 import Image from "next/image";
+const TRANSLATE_URL = "http://localhost:3000/api/translate";
+const ResponseComponent = async () => {
+  "use client";
 
+  const body = new URLSearchParams({
+    direction: "enes",
+    word: "hi",
+  });
+  console.log("Body:", body.toString());
+  const url = `${TRANSLATE_URL}?${body.toString()}`;
+  const myjson = await fetch(url).then((response) => response.json());
+  console.log("asdfasdfasdf");
+  console.log(myjson);
+  return <>{myjson.translation}</>;
+};
 export default function Home() {
   return (
     <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
+      <ResponseComponent></ResponseComponent>
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
         <Image
           className="dark:invert"
