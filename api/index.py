@@ -21,7 +21,7 @@ def translate():
         asdict(translation) for translation in make_translations(wr_content)
     ]
     print(translation_strings)
-    return {"translation": translation_strings}
+    return {"translations": translation_strings}
 
 
 if __name__ == "__main__":

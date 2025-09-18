@@ -1,5 +1,5 @@
 import curl_cffi
-
+from parsel import Selector
 import dataclasses
 
 
@@ -20,11 +20,9 @@ class ToWord:
 
 @dataclasses.dataclass
 class Translation:
+    translation_id: int
     from_word: FromWord
     to_words: list[ToWord]
-
-
-from parsel import Selector
 
 
 def _sanitize_string(text: str) -> str:
@@ -37,7 +35,7 @@ def _sanitize_string(text: str) -> str:
     return text
 
 
-def make_translation_from_trs(trs: list[Selector]) -> Translation:
+def make_translation_from_trs(trs: list[Selector], idx: int) -> Translation:
     print("this many trs", len(trs))
     from_word = None
     to_words = []
@@ -99,7 +97,9 @@ def make_translation_from_trs(trs: list[Selector]) -> Translation:
     if from_word is None:
         raise ValueError("from_word should not be None")
 
-    return Translation(from_word=from_word, to_words=to_words)
+    return Translation(
+        from_word=from_word, to_words=to_words, translation_id=idx
+    )
 
 
 def create_to_word(td1, td2) -> ToWord:
@@ -165,11 +165,11 @@ def make_translations(html_content):
     # print(len(soup.find_all("table", class_="WRD")))
     tables = selector.css("table .WRD")
     translation_objs = []
+    translation_trs = {"regular": []}
     for table in tables:
         print("new table")
         if not table.css("td#regular"):
             continue
-        translations: list[list[Selector]] = []
         cur_translation: list[Selector] = []
         trs = table.css("tr")
         for tr in trs:
@@ -179,13 +179,13 @@ def make_translations(html_content):
             if tr_id and (tr_id.startswith("enes") or tr_id.startswith("esen")):
                 print("new translation")
                 if cur_translation:
-                    translations.append(cur_translation)
+                    translation_trs["regular"].append(cur_translation)
                     cur_translation = []
             cur_translation.append(tr)
-        translations.append(cur_translation)
-        print(f"there are {len(translations)} translations")
-        for translation in translations:
-            translation_objs.append(make_translation_from_trs(translation))
+        translation_trs["regular"].append(cur_translation)
+    print(f"there are {len(translation_trs['regular'])} translations")
+    for idx, translation in enumerate(translation_trs["regular"]):
+        translation_objs.append(make_translation_from_trs(translation, idx))
         print("----")
         # for td in tds:
         # print(td)
