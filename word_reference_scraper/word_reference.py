@@ -36,7 +36,6 @@ def _sanitize_string(text: str) -> str:
 
 
 def make_translation_from_trs(trs: list[Selector], idx: int) -> Translation:
-    print("this many trs", len(trs))
     from_word = None
     to_words = []
     for tr in trs:
@@ -78,13 +77,6 @@ def make_translation_from_trs(trs: list[Selector], idx: int) -> Translation:
                 )
             to_word = create_to_word(tds[1], tds[2])
             to_words.append(to_word)
-            # to = tds[0].css("strong::text").get()  # e.g.hello
-            # if from_text is None:
-            #     raise ValueError("From Word should not be None")
-            # from_pos2 = tds[0].css("em::text").get() or ""
-            # # e.g. interj (interjection)
-            # print(from_text)
-            # print(from_pos2)
         elif len(tds) == 2:
             # phrase translation
             pass
@@ -124,27 +116,7 @@ def create_to_word(td1, td2) -> ToWord:
     return to_word
 
 
-# response = curl_cffi.get(
-#     "https://www.wordreference.com/es/en/translation.asp?spen=hola",
-#     impersonate="chrome",
-# )
-# print(response)
-# print(response.content)
-# with open("translation.html", "wb") as f:
-#     f.write(response.content)
-# with open("translation.html", "rb") as f:
-#     response = f.read()
-# response = curl_cffi.get(
-#     "https://www.wordreference.com/es/en/translation.asp?spen=guau",
-#     impersonate="chrome",
-# )
-# with open("guau.html", "wb") as f:
-#     f.write(response.content)
-# response = curl_cffi.get(
-#     "https://www.wordreference.com/es/translation.asp?tranword=cool",
-#     impersonate="chrome",
-# )
-def translate_word(word, direction) -> bytes:
+def translate_word(word: str, direction: str) -> bytes:
     if direction == "enes":
         url = (
             f"https://www.wordreference.com/es/translation.asp?tranword={word}"
@@ -157,14 +129,13 @@ def translate_word(word, direction) -> bytes:
     return response.content
 
 
-# with open("cool.html", "wb") as f:
-#     f.write(response.content)
-def make_translations(html_content):
-    # soup = BeautifulSoup(html_content, "html.parser")
+def make_translations(html_content: str):
     selector = Selector(html_content)
-    # print(len(soup.find_all("table", class_="WRD")))
     tables = selector.css("table .WRD")
-    translation_objs = []
+    # table ids can be regular, phrasal, additional, compounds
+    # I've found an example where there can be two regular tables
+
+    # ONLY PARSING "REGULAR" TABLE FOR NOW
     translation_trs = {"regular": []}
     for table in tables:
         print("new table")
@@ -184,13 +155,8 @@ def make_translations(html_content):
             cur_translation.append(tr)
         translation_trs["regular"].append(cur_translation)
     print(f"there are {len(translation_trs['regular'])} translations")
+    translation_objs = []
     for idx, translation in enumerate(translation_trs["regular"]):
         translation_objs.append(make_translation_from_trs(translation, idx))
         print("----")
-        # for td in tds:
-        # print(td)
-        # print(table.css("table::has(td#regular)"))
     return translation_objs
-    # ids can be regular, phrasal, additional, compounds
-    # I've found an example where there can be two regular tables but I will just
-    # take the first because the second didn't seem as important

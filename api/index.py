@@ -19,13 +19,11 @@ def home():
 def translate():
     direction = request.args.get("direction")
     word = request.args.get("word")
+    if direction is None or word is None:
+        return "Must provide direction and word", 400
     wr_content = translate_word(word, direction).decode()
     translation_strings = [
         asdict(translation) for translation in make_translations(wr_content)
     ]
     print(translation_strings)
     return {"translations": translation_strings}
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
