@@ -44,3 +44,6 @@ next-env.d.ts
 
 __pycache__
 record.log
+
+word_ref_scraper/build
+*.egg-info

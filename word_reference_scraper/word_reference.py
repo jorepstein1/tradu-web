@@ -8,14 +8,14 @@ class FromWord:
     text: str
     definition: str
     pos2: str
-    fr2: str
+    attributes: str
 
 
 @dataclasses.dataclass
 class ToWord:
     text: str
     pos2: str
-    dsense: str
+    attributes: str
 
 
 @dataclasses.dataclass
@@ -52,8 +52,8 @@ def make_translation_from_trs(trs: list[Selector], idx: int) -> Translation:
                 # e.g. interj (interjection)
                 # Definition can take a few forms including a definition
                 # and optionally a fr2 and a dsense
-                # fr2 qualifies the definitioin
-                # dsense qualifiies the translation
+                # fr2 qualifies the definitioin (attributes)
+                # dsense qualifiies the translation (attributes)
                 # definition iis not wrapped in a tag, and contains text in parantheses
                 # fr2 is in <i class="Fr2">
                 # dsense is in <span class="dsense">  => () => <span /> => Val
@@ -74,7 +74,7 @@ def make_translation_from_trs(trs: list[Selector], idx: int) -> Translation:
                     text=from_text,
                     definition=_sanitize_string(definition),
                     pos2=from_pos2,
-                    fr2=fr2_text,
+                    attributes=fr2_text,
                 )
             to_word = create_to_word(tds[1], tds[2])
             to_words.append(to_word)
@@ -119,7 +119,7 @@ def create_to_word(td1, td2) -> ToWord:
     to_word = ToWord(
         text=_sanitize_string(to_text),
         pos2=_sanitize_string(to_pos2_text),
-        dsense=_sanitize_string(dsense_text),
+        attributes=_sanitize_string(dsense_text),
     )
     return to_word
 

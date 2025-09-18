@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { AppBar, Box, Button, Container, Toolbar } from "@mui/material";
+import { AppBar, Box, Card, Button, Container, Toolbar } from "@mui/material";
 
 const TRANSLATE_URL = "http://localhost:3000/api/translate";
 interface FromWord {
@@ -18,6 +18,9 @@ interface Translation {
   to_words: ToWord[];
   translation_id: number;
 }
+const TranslationCard = ({ translation }: { translation: Translation }) => {
+  return <Card></Card>;
+};
 const ResponseComponent = async () => {
   "use client";
 
@@ -35,9 +38,10 @@ const ResponseComponent = async () => {
   return (
     <>
       {myjson.translations.map((translation) => (
-        <Box key={translation.translation_id}>
-          {translation.to_words.toString()}
-        </Box>
+        <TranslationCard
+          key={translation.translation_id}
+          translation={translation}
+        />
       ))}
     </>
   );

@@ -1,5 +1,8 @@
 from flask import Flask, request
-from translate.word_reference import translate_word, make_translations
+from word_reference_scraper.word_reference import (
+    translate_word,
+    make_translations,
+)
 from dataclasses import asdict
 import logging
 
