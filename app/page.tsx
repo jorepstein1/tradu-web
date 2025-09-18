@@ -1,50 +1,33 @@
 import Image from "next/image";
-import { AppBar, Box, Card, Button, Container, Toolbar } from "@mui/material";
-
+import { AppBar, Box, Container, Toolbar } from "@mui/material";
+import {
+  Translation,
+  TranslationCardList,
+} from "../components/TranslationCard";
 const TRANSLATE_URL = "http://localhost:3000/api/translate";
-interface FromWord {
-  text: string;
-  definition: string;
-  pos2: string;
-  fr2: string;
-}
-interface ToWord {
-  text: string;
-  pos2: string;
-  dsense: string;
-}
-interface Translation {
-  from_word: FromWord;
-  to_words: ToWord[];
-  translation_id: number;
-}
-const TranslationCard = ({ translation }: { translation: Translation }) => {
-  return <Card></Card>;
-};
-const ResponseComponent = async () => {
-  "use client";
 
-  const body = new URLSearchParams({
-    direction: "enes",
-    word: "hi",
-  });
+const getTranslations = async (
+  direction: string,
+  word: string
+): Promise<Translation[]> => {
+  const body = new URLSearchParams({ direction, word });
   console.log("Body:", body.toString());
   const url = `${TRANSLATE_URL}?${body.toString()}`;
-  const myjson: { translations: Translation[] } = await fetch(url).then(
-    (response) => response.json()
-  );
-  console.log("asdfasdfasdf");
-  console.log(myjson);
-  return (
-    <>
-      {myjson.translations.map((translation) => (
-        <TranslationCard
-          key={translation.translation_id}
-          translation={translation}
-        />
-      ))}
-    </>
-  );
+  return fetch(url)
+    .then((response) => response.json())
+    .then((json) => json.translations);
+};
+
+export const TranslationCards = async ({
+  direction,
+  word,
+}: {
+  direction: string;
+  word: string;
+}) => {
+  const translations = await getTranslations(direction, word);
+  console.log(translations);
+  return <TranslationCardList translations={translations} />;
 };
 export default function Home() {
   return (
@@ -60,8 +43,10 @@ export default function Home() {
           </AppBar>
         </Box>
       </Box>
-      <ResponseComponent></ResponseComponent>
-
+      <Box>
+        <div>"I'm a div in a box"</div>
+        <TranslationCards word="hello" direction="enes" />
+      </Box>
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"

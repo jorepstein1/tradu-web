@@ -7,15 +7,15 @@ import dataclasses
 class FromWord:
     text: str
     definition: str
-    pos2: str
-    attributes: str
+    part_of_speech: str
+    sense: str
 
 
 @dataclasses.dataclass
 class ToWord:
     text: str
-    pos2: str
-    attributes: str
+    part_of_speech: str
+    sense: str
 
 
 @dataclasses.dataclass
@@ -47,12 +47,12 @@ def make_translation_from_trs(trs: list[Selector], idx: int) -> Translation:
                 from_text = tds[0].css("strong::text").get()  # e.g.hello
                 if from_text is None:
                     raise ValueError("From Word should not be None")
-                from_pos2 = tds[0].css("em::text").get() or ""
+                from_part_of_speech = tds[0].css("em::text").get() or ""
                 # e.g. interj (interjection)
                 # Definition can take a few forms including a definition
                 # and optionally a fr2 and a dsense
-                # fr2 qualifies the definitioin (attributes)
-                # dsense qualifiies the translation (attributes)
+                # fr2 qualifies the definitioin (sense)
+                # dsense qualifiies the translation (sense)
                 # definition iis not wrapped in a tag, and contains text in parantheses
                 # fr2 is in <i class="Fr2">
                 # dsense is in <span class="dsense">  => () => <span /> => Val
@@ -72,8 +72,8 @@ def make_translation_from_trs(trs: list[Selector], idx: int) -> Translation:
                 from_word = FromWord(
                     text=from_text,
                     definition=_sanitize_string(definition),
-                    pos2=from_pos2,
-                    attributes=fr2_text,
+                    part_of_speech=from_part_of_speech,
+                    sense=fr2_text,
                 )
             to_word = create_to_word(tds[1], tds[2])
             to_words.append(to_word)
@@ -99,19 +99,19 @@ def create_to_word(td1, td2) -> ToWord:
     to_td = td2
     if not to_td.attrib.get("class") == "ToWrd":
         raise ValueError("Third td should have ToWrd class")
-    to_pos2 = td2.css(".POS2")
-    if to_pos2 := td2.css(".POS2"):
-        to_pos2_text = to_pos2.css("::text").get() or ""
-        to_pos2.drop()  # to isolate the to text
+    to_part_of_speech = td2.css(".POS2")
+    if to_part_of_speech := td2.css(".POS2"):
+        to_part_of_speech_text = to_part_of_speech.css("::text").get() or ""
+        to_part_of_speech.drop()  # to isolate the to text
     else:
-        to_pos2_text = ""
+        to_part_of_speech_text = ""
     to_text = to_td.css("::text").get()
     if not to_text:
         raise ValueError("To Text should not be None")
     to_word = ToWord(
         text=_sanitize_string(to_text),
-        pos2=_sanitize_string(to_pos2_text),
-        attributes=_sanitize_string(dsense_text),
+        part_of_speech=_sanitize_string(to_part_of_speech_text),
+        sense=_sanitize_string(dsense_text),
     )
     return to_word
 
