@@ -1,13 +1,9 @@
 "use client";
-
-import { useDrag } from "react-dnd";
-import { Card, CardContent } from "./ui/card";
+import { DndContext } from "@dnd-kit/core";
+import { useDraggable } from "@dnd-kit/core";
+import { Card, CardContent, CardHeader } from "./ui/card";
 import { Badge } from "./ui/badge";
-// <DndProvider backend={HTML5Backend}>
 
-// <DndProvider />
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
 interface FromWord {
   text: string;
   definition: string;
@@ -22,7 +18,7 @@ interface ToWord {
 export interface Translation {
   from_word: FromWord;
   to_words: ToWord[];
-  translation_id: number;
+  translation_id: string;
 }
 export const TranslationCardList = ({
   translations,
@@ -30,40 +26,49 @@ export const TranslationCardList = ({
   translations: Translation[];
 }) => {
   return (
-    <DndProvider backend={HTML5Backend}>
-      {translations.map((translation) => (
-        <TranslationCard
-          translation={translation}
-          key={translation.translation_id}
-        />
-      ))}
-    </DndProvider>
+    <DndContext>
+      <Card className="border-border bg-card">
+        <CardHeader>Search Results</CardHeader>
+        <CardContent>
+          {translations.map((translation) => (
+            <TranslationCard
+              translation={translation}
+              key={translation.translation_id}
+            />
+          ))}
+        </CardContent>
+      </Card>
+    </DndContext>
   );
 };
 
-export const TranslationCard: React.FC<{ translation: Translation }> = ({
+export const TranslationCard = ({
   translation,
+}: {
+  translation: Translation;
 }) => {
-  const [{ isDragging }, drag] = useDrag(() => ({
-    type: "translation",
-    item: { translation },
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-    }),
-  }));
-
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: translation.translation_id,
+  });
+  const style = transform
+    ? {
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+      }
+    : undefined;
+  // className={`cursor-move transition-opacity ${
+  //   isDragging ? "opacity-50" : ""
+  //   }`}
+  //   className={`border-border bg-card ${
+  //   !isDragging ? "hover:bg-sidebar-accent" : ""
+  // }`}
   return (
-    <div
-      ref={drag}
-      className={`cursor-move transition-opacity ${
-        isDragging ? "opacity-50" : ""
-      }`}
+    <li
+      ref={setNodeRef}
+      style={{ ...style, listStyle: "None" }}
+      {...listeners}
+      {...attributes}
     >
-      <Card
-        className={`border-border bg-card ${
-          !isDragging ? "hover:bg-sidebar-accent" : ""
-        }`}
-      >
+      <Card>
         <CardContent className="p-4">
           <div className="flex items-start justify-between gap-2 mb-2">
             <span className="text-card-foreground font-medium">
@@ -123,6 +128,6 @@ export const TranslationCard: React.FC<{ translation: Translation }> = ({
           )} */}
         </CardContent>
       </Card>
-    </div>
+    </li>
   );
 };

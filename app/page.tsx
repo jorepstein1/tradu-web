@@ -1,9 +1,6 @@
 import Image from "next/image";
-import { AppBar, Box, Container, Toolbar } from "@mui/material";
-import {
-  Translation,
-  TranslationCardList,
-} from "../components/TranslationCard";
+import { Translation } from "../components/TranslationCard";
+import { ResultsSpace } from "@/components/ResultsSpace";
 const TRANSLATE_URL = "http://localhost:3000/api/translate";
 
 const getTranslations = async (
@@ -27,26 +24,15 @@ export const TranslationCards = async ({
 }) => {
   const translations = await getTranslations(direction, word);
   console.log(translations);
-  return <TranslationCardList translations={translations} />;
+  return <ResultsSpace translations={translations} />;
 };
 export default function Home() {
   return (
     <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <Box>
-        <Box>
-          <AppBar position="sticky">
-            <Container>
-              <Toolbar>
-                <Image src="/icon.png" alt="Logo" width={50} height={50} />
-              </Toolbar>
-            </Container>
-          </AppBar>
-        </Box>
-      </Box>
-      <Box>
-        <div>"I'm a div in a box"</div>
+      <div>Search Bar</div>
+      <div>
         <TranslationCards word="hello" direction="enes" />
-      </Box>
+      </div>
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
