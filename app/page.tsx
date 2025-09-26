@@ -1,38 +1,9 @@
 import Image from "next/image";
-import { Translation } from "../components/TranslationCard";
-import { ResultsSpace } from "@/components/ResultsSpace";
-const TRANSLATE_URL = "http://localhost:3000/api/translate";
-
-const getTranslations = async (
-  direction: string,
-  word: string
-): Promise<Translation[]> => {
-  const body = new URLSearchParams({ direction, word });
-  console.log("Body:", body.toString());
-  const url = `${TRANSLATE_URL}?${body.toString()}`;
-  return fetch(url)
-    .then((response) => response.json())
-    .then((json) => json.translations);
-};
-
-export const TranslationCards = async ({
-  direction,
-  word,
-}: {
-  direction: string;
-  word: string;
-}) => {
-  const translations = await getTranslations(direction, word);
-  console.log(translations);
-  return <ResultsSpace translations={translations} />;
-};
+import { Tradu } from "@/components/Tradu";
 export default function Home() {
   return (
     <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <div>Search Bar</div>
-      <div>
-        <TranslationCards word="hello" direction="enes" />
-      </div>
+      <Tradu />
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"

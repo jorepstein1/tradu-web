@@ -1,9 +1,17 @@
 "use client";
-import { DndContext } from "@dnd-kit/core";
+import React from "react";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import { useDroppable } from "@dnd-kit/core";
-export const CardDropZone = ({ id, children, header }) => {
-  const { isOver, setNodeRef } = useDroppable({
+export const CardDropZone = ({
+  id,
+  children,
+  header,
+}: {
+  id: string;
+  header: string;
+  children: React.ReactNode;
+}) => {
+  const { setNodeRef } = useDroppable({
     id: id,
   });
   return (
