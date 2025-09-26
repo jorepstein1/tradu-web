@@ -9,21 +9,15 @@ export const ResultsSpace = ({
   translations: Translation[];
 }) => {
   const [toMake, setToMake] = useState<Set<string>>(() => new Set());
-  console.log(`To make is ${[...toMake]}`);
   const onDragEnd = (event: DragEndEvent) => {
     const { over } = event;
-    if (over === null) {
-      console.log("null");
-    } else {
+    if (over !== null) {
       const resultsCopy = new Set(toMake);
       if (over.id == "from") {
         resultsCopy.delete(event.active.id as string);
-        console.log("from");
       } else {
         resultsCopy.add(event.active.id as string);
-        console.log("to");
       }
-      console.log(`copy:: ${[...resultsCopy]}`);
       setToMake(resultsCopy);
     }
   };
@@ -33,9 +27,6 @@ export const ResultsSpace = ({
         <CardDropZone id="from" header="Search Results">
           {translations
             .filter((translation) => {
-              console.log(
-                `has ${translation.translation_id} ${toMake.has(translation.translation_id)}`
-              );
               return !toMake.has(translation.translation_id);
             })
             .map((translation) => (
