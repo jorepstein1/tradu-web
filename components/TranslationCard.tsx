@@ -96,9 +96,9 @@ export const TranslationCard = ({
             <span className="text-primary font-medium">→ </span>
             <div className="flex flex-wrap gap-2">
               {translation.to_words.map((to_word, index) => (
-                <div key={index} className="flex items-center gap-1">
+                <div key={index}>
                   <span className="text-primary font-medium">
-                    {to_word.text}
+                    {to_word.text + " "}
                   </span>
                   {(to_word.part_of_speech || to_word.sense) && (
                     <span className="text-xs text-muted-foreground">

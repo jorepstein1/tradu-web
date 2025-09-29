@@ -35,7 +35,11 @@ export const ResultsSpace = ({
     setActiveId(event.active.id);
   };
   const uploadCards = () => {
-    const body = JSON.stringify(Array.from(toMake));
+    const body = JSON.stringify(
+      translations.filter((translation) =>
+        toMake.has(translation.translation_id)
+      )
+    );
     console.log("body", body);
     const url = "http://localhost:3000/api/upload";
     const response = fetch(url, {
