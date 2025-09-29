@@ -31,7 +31,7 @@ export const Tradu = () => {
     []
   ); // The Action to perform the Search
   return (
-    <div>
+    <div className="max-w-7xl mx-auto space-y-6 h-screen max-h-screen">
       <div>
         <SearchSection searchAction={searchAction} loading={searchIsPending} />
       </div>

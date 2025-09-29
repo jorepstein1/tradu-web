@@ -47,14 +47,10 @@ export const TranslationCard = ({
 }: {
   translation: Translation;
 }) => {
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: translation.translation_id,
   });
-  const style = transform
-    ? {
-        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-      }
-    : undefined;
+
   // className={`cursor-move transition-opacity ${
   //   isDragging ? "opacity-50" : ""
   //   }`}
@@ -64,12 +60,12 @@ export const TranslationCard = ({
   return (
     <li
       ref={setNodeRef}
-      style={{ ...style, listStyle: "None" }}
+      style={{ listStyle: "None" }}
       {...listeners}
       {...attributes}
     >
-      <Card>
-        <CardContent className="p-4">
+      <Card className={`cursor-move ${isDragging ? "opacity-50" : ""}`}>
+        <CardContent className="p-4 border-border">
           <div className="flex items-start justify-between gap-2 mb-2">
             <span className="text-card-foreground font-medium">
               {translation.from_word.text}
@@ -120,12 +116,6 @@ export const TranslationCard = ({
               ))}
             </div>
           </div>
-
-          {/* {translation.example && (
-            <div className="text-xs text-muted-foreground italic">
-              {translation.example}
-            </div>
-          )} */}
         </CardContent>
       </Card>
     </li>

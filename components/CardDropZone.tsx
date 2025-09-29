@@ -15,9 +15,11 @@ export const CardDropZone = ({
     id: id,
   });
   return (
-    <Card className="border-border bg-card" ref={setNodeRef}>
+    <Card className="border-border bg-card max-h-200" ref={setNodeRef}>
       <CardHeader>{header}</CardHeader>
-      <CardContent>{children}</CardContent>
+      <CardContent className="overflow-y-auto">
+        <ul>{children}</ul>
+      </CardContent>
     </Card>
   );
 };
