@@ -9,6 +9,7 @@ import {
 import { CardDropZone } from "./CardDropZone";
 import { Translation, TranslationCard } from "./TranslationCard";
 import { useState } from "react";
+
 export const ResultsSpace = ({
   translations,
 }: {
@@ -33,6 +34,10 @@ export const ResultsSpace = ({
   const onDragStart = (event: DragStartEvent) => {
     setActiveId(event.active.id);
   };
+  const uploadCards = () => {
+    console.log(toMake);
+  };
+
   const activeTranslation = translations.find(
     (translation) => translation.translation_id == activeId
   );
@@ -52,7 +57,7 @@ export const ResultsSpace = ({
             ))}
         </CardDropZone>
 
-        <CardDropZone id="to" header="Cards to Make">
+        <CardDropZone id="to" header="Cards to Make" uploadCards={uploadCards}>
           {translations
             .filter((translation) => toMake.has(translation.translation_id))
             .map((translation) => (
