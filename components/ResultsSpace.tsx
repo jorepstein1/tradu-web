@@ -35,7 +35,17 @@ export const ResultsSpace = ({
     setActiveId(event.active.id);
   };
   const uploadCards = () => {
-    console.log(toMake);
+    const body = JSON.stringify(Array.from(toMake));
+    console.log("body", body);
+    const url = "http://localhost:3000/api/upload";
+    const response = fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+      },
+      body: body,
+    }).then((response) => response.json());
+    console.log(response);
   };
 
   const activeTranslation = translations.find(

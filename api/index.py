@@ -27,3 +27,11 @@ def translate():
     ]
     print(translation_strings)
     return {"translations": translation_strings}
+
+
+@app.route("/api/upload", methods=["POST"])
+def upload():
+    if request.method == "POST":
+        data = request.get_json()
+        print(data)
+    return {}
