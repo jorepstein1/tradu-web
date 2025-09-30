@@ -3,6 +3,7 @@ import { useActionState, useState } from "react";
 import { SearchSection } from "@/components/HeaderAndSearchSpace";
 import { ResultsSpace } from "@/components/ResultsSpace";
 import { Translation } from "@/components/TranslationCard";
+import { UniqueIdentifier } from "@dnd-kit/core";
 const TRANSLATE_URL = "http://localhost:3000/api/translate";
 
 const getTranslations = async (
@@ -18,6 +19,9 @@ const getTranslations = async (
 };
 
 export const Tradu = () => {
+  const [selectedTranslationIds, setSelectedTranslationIds] = useState<
+    Set<UniqueIdentifier>
+  >(() => new Set());
   const [translationDirection, setTranslationDirection] = useState("esen");
   const [translationResponse, searchAction, searchIsPending] = useActionState(
     async (_previousState: Translation[], formData: FormData) => {
@@ -29,6 +33,7 @@ export const Tradu = () => {
           translationDirection,
           term
         );
+        setSelectedTranslationIds(new Set());
         return translationResults;
       }
     },
@@ -45,7 +50,11 @@ export const Tradu = () => {
         />
       </div>
       <div>
-        <ResultsSpace translations={translationResponse} />
+        <ResultsSpace
+          translations={translationResponse}
+          selectedTranslationIds={selectedTranslationIds}
+          setSelectedTranslationIds={setSelectedTranslationIds}
+        />
       </div>
     </div>
   );

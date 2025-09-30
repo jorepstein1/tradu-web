@@ -12,22 +12,25 @@ import { useState } from "react";
 
 export const ResultsSpace = ({
   translations,
+  selectedTranslationIds,
+  setSelectedTranslationIds,
 }: {
   translations: Translation[];
+  selectedTranslationIds: Set<UniqueIdentifier>;
+  setSelectedTranslationIds: (value: Set<UniqueIdentifier>) => void;
 }) => {
-  const [toMake, setToMake] = useState<Set<UniqueIdentifier>>(() => new Set());
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
 
   const onDragEnd = (event: DragEndEvent) => {
     const { over } = event;
     if (over !== null) {
-      const resultsCopy = new Set(toMake);
+      const resultsCopy = new Set(selectedTranslationIds);
       if (over.id == "from") {
         resultsCopy.delete(event.active.id);
       } else {
         resultsCopy.add(event.active.id);
       }
-      setToMake(resultsCopy);
+      setSelectedTranslationIds(resultsCopy);
     }
     setActiveId(null);
   };
@@ -37,7 +40,7 @@ export const ResultsSpace = ({
   const uploadCards = () => {
     const body = JSON.stringify(
       translations.filter((translation) =>
-        toMake.has(translation.translation_id)
+        selectedTranslationIds.has(translation.translation_id)
       )
     );
     console.log("body", body);
@@ -61,7 +64,7 @@ export const ResultsSpace = ({
         <CardDropZone id="from" header="Search Results">
           {translations
             .filter((translation) => {
-              return !toMake.has(translation.translation_id);
+              return !selectedTranslationIds.has(translation.translation_id);
             })
             .map((translation) => (
               <TranslationCard
@@ -73,7 +76,9 @@ export const ResultsSpace = ({
 
         <CardDropZone id="to" header="Cards to Make" uploadCards={uploadCards}>
           {translations
-            .filter((translation) => toMake.has(translation.translation_id))
+            .filter((translation) =>
+              selectedTranslationIds.has(translation.translation_id)
+            )
             .map((translation) => (
               <TranslationCard
                 translation={translation}
