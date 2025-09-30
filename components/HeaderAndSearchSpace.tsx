@@ -2,15 +2,20 @@ import { useState } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
+import { ArrowLeftRight } from "lucide-react";
 
 interface SearchSectionProps {
   searchAction: (formData: FormData) => void;
   loading: boolean;
+  translationDirection: string;
+  setTranslationDirection: (value: string) => void;
 }
 
 export const SearchSection: React.FC<SearchSectionProps> = ({
   searchAction,
   loading,
+  translationDirection,
+  setTranslationDirection,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -33,6 +38,23 @@ export const SearchSection: React.FC<SearchSectionProps> = ({
               onChange={(e) => setSearchTerm(e.target.value)}
               className="flex-1 border-border bg-input-background text-card-foreground placeholder:text-muted-foreground"
             />
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                if (translationDirection == "esen") {
+                  console.log("Setting to enes");
+                  setTranslationDirection("enes");
+                } else {
+                  console.log("Setting to esen");
+                  setTranslationDirection("esen");
+                }
+              }}
+            >
+              {translationDirection == "esen" ? "Spanish" : "English"}
+              <ArrowLeftRight />
+              {translationDirection == "esen" ? "English" : "Spanish"}
+            </Button>
             <Button
               type="submit"
               disabled={loading || !searchTerm.trim()}

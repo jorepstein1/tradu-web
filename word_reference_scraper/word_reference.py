@@ -125,6 +125,7 @@ def translate_word(word: str, direction: str) -> bytes:
         url = f"https://www.wordreference.com/es/en/translation.asp?spen={word}"
     else:
         raise ValueError(f"Invalid value for direction: {direction}")
+    print(url)
     response = curl_cffi.get(url, impersonate="chrome")
     return response.content
 

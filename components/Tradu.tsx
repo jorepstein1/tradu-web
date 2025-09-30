@@ -1,5 +1,5 @@
 "use client";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { SearchSection } from "@/components/HeaderAndSearchSpace";
 import { ResultsSpace } from "@/components/ResultsSpace";
 import { Translation } from "@/components/TranslationCard";
@@ -18,13 +18,17 @@ const getTranslations = async (
 };
 
 export const Tradu = () => {
+  const [translationDirection, setTranslationDirection] = useState("esen");
   const [translationResponse, searchAction, searchIsPending] = useActionState(
     async (_previousState: Translation[], formData: FormData) => {
       const term = formData.get("term");
       if (typeof term !== "string") {
         return [];
       } else {
-        const translationResults = await getTranslations("esen", term);
+        const translationResults = await getTranslations(
+          translationDirection,
+          term
+        );
         return translationResults;
       }
     },
@@ -33,7 +37,12 @@ export const Tradu = () => {
   return (
     <div className="max-w-7xl mx-auto space-y-6 h-screen max-h-screen">
       <div>
-        <SearchSection searchAction={searchAction} loading={searchIsPending} />
+        <SearchSection
+          searchAction={searchAction}
+          loading={searchIsPending}
+          translationDirection={translationDirection}
+          setTranslationDirection={setTranslationDirection}
+        />
       </div>
       <div>
         <ResultsSpace translations={translationResponse} />
