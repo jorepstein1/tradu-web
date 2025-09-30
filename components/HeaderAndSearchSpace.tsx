@@ -23,7 +23,7 @@ export const SearchSection: React.FC<SearchSectionProps> = ({
     <Card className="border-border bg-card">
       <CardContent className="p-6">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-card-foreground">Traduz</h1>
+          <h1 className="text-card-foreground text-5xl">Traduz</h1>
         </div>
 
         <form className="space-y-4">
