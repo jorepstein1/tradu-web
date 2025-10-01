@@ -31,7 +31,28 @@ def translate():
 
 @app.route("/api/get-decks")
 def get_decks():
-    return {"decks": [{"id": "deck_id", "name": "deck name"}]}
+    mochi_api_key = request.args.get("mochiApiKey")
+    if mochi_api_key is None:
+        return "Must provide Mochi API Key", 400
+    try:
+        response = requests.get(
+            f"{MOCHI_BASE_URL}/decks", auth=(mochi_api_key, ""), timeout=10
+        )
+        response.raise_for_status()
+
+        decks_data = response.json()
+
+    except requests.exceptions.RequestException as e:
+        print(f"Failed to retrieve decks from Mochi: {e}")
+        return str(e), 400
+    decks = []
+    for deck_data in decks_data.get("docs", []):
+        deck = {
+            "id": deck_data["id"],
+            "name": deck_data["name"],
+        }
+        decks.append(deck)
+    return {"decks": decks}
 
 
 @app.route("/api/get-templates")

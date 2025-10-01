@@ -92,10 +92,24 @@ export const SettingsModalDialog = ({
     const fetchedMochiDecks = await getMochiDecks(mochiApiKey);
     console.log(fetchedMochiDecks);
     setDecks(fetchedMochiDecks);
+    if (fetchedMochiDecks.length) {
+      if (!fetchedMochiDecks.map((deck) => deck.id).includes(mochiDeckId)) {
+        setMochiDeckId(fetchedMochiDecks[0].id);
+      }
+    }
     const fetchedMochiTemplates = await getMochiTemplates(mochiApiKey);
     console.log(fetchedMochiTemplates);
 
     setTemplates(fetchedMochiTemplates);
+    if (fetchedMochiTemplates.length) {
+      if (
+        !fetchedMochiTemplates
+          .map((template) => template.id)
+          .includes(mochiTemplateId)
+      ) {
+        setMochiTemplateId(fetchedMochiTemplates[0].id);
+      }
+    }
   };
   const handleCreateTemplate = async () => {
     setCreatingTemplate(true);
