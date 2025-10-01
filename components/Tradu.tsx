@@ -4,6 +4,8 @@ import { SearchSection } from "@/components/HeaderAndSearchSpace";
 import { ResultsSpace } from "@/components/ResultsSpace";
 import { Translation } from "@/components/TranslationCard";
 import { UniqueIdentifier } from "@dnd-kit/core";
+import Cookies from "js-cookie";
+import { SettingsModalDialog } from "./SettingsModalDialog";
 const TRANSLATE_URL = "http://localhost:3000/api/translate";
 
 const getTranslations = async (
@@ -19,6 +21,10 @@ const getTranslations = async (
 };
 
 export const Tradu = () => {
+  const savedMochiApiKey = Cookies.get("mochi-api-key") || "";
+  const savedMochiDeckId = Cookies.get("mochi-deck-id") || "";
+  const savedMochiTemplateId = Cookies.get("mochi-template-id") || "";
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [selectedTranslationIds, setSelectedTranslationIds] = useState<
     Set<UniqueIdentifier>
   >(() => new Set());
@@ -39,6 +45,15 @@ export const Tradu = () => {
     },
     []
   ); // The Action to perform the Search
+  const onSaveSettings = (
+    newMochiApiKey: string,
+    newMochiDeckId: string,
+    newMochiTemplateId: string
+  ) => {
+    Cookies.set("mochi-api-key", newMochiApiKey);
+    Cookies.set("mochi-deck-id", newMochiDeckId);
+    Cookies.set("mochi-template-id", newMochiTemplateId);
+  };
   return (
     <div className="max-w-7xl mx-auto space-y-6 h-screen max-h-screen">
       <div>
@@ -47,6 +62,9 @@ export const Tradu = () => {
           loading={searchIsPending}
           translationDirection={translationDirection}
           setTranslationDirection={setTranslationDirection}
+          openSettings={() => {
+            setSettingsOpen(true);
+          }}
         />
       </div>
       <div>
@@ -56,6 +74,16 @@ export const Tradu = () => {
           setSelectedTranslationIds={setSelectedTranslationIds}
         />
       </div>
+      <SettingsModalDialog
+        isOpen={settingsOpen}
+        onClose={() => {
+          setSettingsOpen(false);
+        }}
+        savedMochiApiKey={savedMochiApiKey}
+        savedMochiDeckId={savedMochiDeckId}
+        savedMochiTemplateId={savedMochiTemplateId}
+        onSaveSettings={onSaveSettings}
+      />
     </div>
   );
 };

@@ -14,11 +14,6 @@ logging.basicConfig(filename="record.log", level=logging.DEBUG)
 app = Flask(__name__)
 
 
-@app.route("/")
-def home():
-    return "Hello, World!"
-
-
 @app.route("/api/translate")
 def translate():
     direction = request.args.get("direction")
@@ -31,6 +26,24 @@ def translate():
     ]
     print(translation_strings)
     return {"translations": translation_strings}
+
+
+@app.route("/api/get-decks")
+def get_decks():
+    return {"decks": [{"id": "deck_id", "name": "deck name"}]}
+
+
+@app.route("/api/get-templates")
+def get_templates():
+    return {
+        "templates": [
+            {
+                "id": "template_id",
+                "name": "template name",
+                "fields": ["Word", "Translation", "Example", "Word Type"],
+            }
+        ]
+    }
 
 
 @app.route("/api/upload", methods=["POST"])

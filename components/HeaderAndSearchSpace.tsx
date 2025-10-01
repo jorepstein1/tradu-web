@@ -2,13 +2,14 @@ import { useState } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
-import { ArrowLeftRight } from "lucide-react";
+import { ArrowLeftRight, Settings } from "lucide-react";
 
 interface SearchSectionProps {
   searchAction: (formData: FormData) => void;
   loading: boolean;
   translationDirection: string;
   setTranslationDirection: (value: string) => void;
+  openSettings: () => void;
 }
 
 export const SearchSection: React.FC<SearchSectionProps> = ({
@@ -16,6 +17,7 @@ export const SearchSection: React.FC<SearchSectionProps> = ({
   loading,
   translationDirection,
   setTranslationDirection,
+  openSettings,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -24,6 +26,15 @@ export const SearchSection: React.FC<SearchSectionProps> = ({
       <CardContent className="p-6">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-card-foreground text-5xl">Traduz</h1>
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-border text-card-foreground hover:bg-sidebar-accent"
+            onClick={openSettings}
+          >
+            <Settings className="w-4 h-4 mr-2" />
+            Settings
+          </Button>
         </div>
 
         <form className="space-y-4">
