@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import {
   Dialog,
@@ -110,6 +110,9 @@ export const SettingsModalDialog = ({
       setCreatingTemplate(false);
     }
   };
+  useEffect(() => {
+    loadMochiData();
+  }, [mochiApiKey]);
   // Filter templates that have all required fields
   const compatibleTemplates = templates.filter((template) =>
     requiredTemplateFields.every((field) => template.fields.includes(field))
@@ -117,7 +120,7 @@ export const SettingsModalDialog = ({
 
   const hasCompatibleTemplates = compatibleTemplates.length > 0;
   return (
-    <Dialog open={isOpen}>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Configure mochi.cards connection</DialogTitle>
