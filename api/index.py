@@ -12,6 +12,7 @@ import requests
 
 logging.basicConfig(filename="record.log", level=logging.DEBUG)
 app = Flask(__name__)
+MOCHI_BASE_URL = "https://app.mochi.cards/api"
 
 
 @app.route("/api/translate")
@@ -35,15 +36,39 @@ def get_decks():
 
 @app.route("/api/get-templates")
 def get_templates():
-    return {
-        "templates": [
-            {
-                "id": "template_id",
-                "name": "template name",
-                "fields": ["Word", "Translation", "Example", "Word Type"],
-            }
-        ]
-    }
+    mochi_api_key = request.args.get("mochiApiKey")
+    if mochi_api_key is None:
+        return "Must provide Mochi API Key", 400
+    try:
+        response = requests.get(
+            f"{MOCHI_BASE_URL}/templates",
+            auth=(mochi_api_key, ""),
+            timeout=10,
+        )
+        response.raise_for_status()
+        templates_data = response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Failed to retrieve templates from Mochi: {e}")
+        return str(e), 400
+
+    templates = []
+    if (
+        templates_data
+        and "docs" in templates_data
+        and len(templates_data["docs"]) > 0
+    ):
+        for template_dict in templates_data["docs"]:
+            templates.append(
+                {
+                    "id": template_dict["id"],
+                    "name": template_dict["name"],
+                    "fields": [
+                        field_dict["name"]
+                        for field_dict in template_dict["fields"].values()
+                    ],
+                }
+            )
+    return {"templates": templates}
 
 
 @app.route("/api/upload", methods=["POST"])
