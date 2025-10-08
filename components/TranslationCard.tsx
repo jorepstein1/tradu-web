@@ -3,23 +3,7 @@ import { DndContext } from "@dnd-kit/core";
 import { useDraggable } from "@dnd-kit/core";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import { Badge } from "./ui/badge";
-
-interface FromWord {
-  text: string;
-  definition: string;
-  part_of_speech: string;
-  sense: string;
-}
-interface ToWord {
-  text: string;
-  part_of_speech: string;
-  sense: string;
-}
-export interface Translation {
-  from_word: FromWord;
-  to_words: ToWord[];
-  translation_id: string;
-}
+import { Translation } from "@/services/mochiApi";
 export const TranslationCardList = ({
   translations,
 }: {

@@ -31,22 +31,20 @@ def translate():
 
 @app.route("/api/get-decks")
 def get_decks():
+    print("Getting decks from Mochi")
     mochi_api_key = request.args.get("mochiApiKey")
     if mochi_api_key is None:
         return "Must provide Mochi API Key", 400
-    try:
-        response = requests.get(
-            f"{MOCHI_BASE_URL}/decks", auth=(mochi_api_key, ""), timeout=10
-        )
-        response.raise_for_status()
 
-        decks_data = response.json()
+    response, code = make_mochi_request(
+        f"{MOCHI_BASE_URL}/decks", mochi_api_key
+    )
+    if code == 400:
+        print("returning", response, code)
+        return response, code
 
-    except requests.exceptions.RequestException as e:
-        print(f"Failed to retrieve decks from Mochi: {e}")
-        return str(e), 400
     decks = []
-    for deck_data in decks_data.get("docs", []):
+    for deck_data in response.get("docs", []):
         deck = {
             "id": deck_data["id"],
             "name": deck_data["name"],
@@ -57,39 +55,49 @@ def get_decks():
 
 @app.route("/api/get-templates")
 def get_templates():
+    print("Getting Mochi templates")
     mochi_api_key = request.args.get("mochiApiKey")
     if mochi_api_key is None:
         return "Must provide Mochi API Key", 400
-    try:
-        response = requests.get(
-            f"{MOCHI_BASE_URL}/templates",
-            auth=(mochi_api_key, ""),
-            timeout=10,
-        )
-        response.raise_for_status()
-        templates_data = response.json()
-    except requests.exceptions.RequestException as e:
-        print(f"Failed to retrieve templates from Mochi: {e}")
-        return str(e), 400
+
+    response, code = make_mochi_request(
+        f"{MOCHI_BASE_URL}/templates", mochi_api_key
+    )
+    if code == 400:
+        print("returning", response, code)
+        return response, code
 
     templates = []
-    if (
-        templates_data
-        and "docs" in templates_data
-        and len(templates_data["docs"]) > 0
-    ):
-        for template_dict in templates_data["docs"]:
-            templates.append(
-                {
-                    "id": template_dict["id"],
-                    "name": template_dict["name"],
-                    "fields": [
-                        field_dict["name"]
-                        for field_dict in template_dict["fields"].values()
-                    ],
-                }
-            )
+    for template_data in response.get("docs", []):
+        templates.append(
+            {
+                "id": template_data["id"],
+                "name": template_data["name"],
+                "fields": [
+                    field_dict["name"]
+                    for field_dict in template_data["fields"].values()
+                ],
+            }
+        )
     return {"templates": templates}
+
+
+def make_mochi_request(url: str, api_key: str) -> tuple[dict, int]:
+    try:
+        response = requests.get(url, auth=(api_key, ""), timeout=10)
+    except requests.exceptions.RequestException as e:
+        print(f"Requests Exception: {e}")
+        return {"errors": str(e)}, 400
+
+    decks_data = response.json()
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        if decks_data.get("errors"):
+            return decks_data, 400
+        else:
+            return {"errors": str(e)}, 400
+    return decks_data, 200
 
 
 @app.route("/api/upload", methods=["POST"])
@@ -99,7 +107,7 @@ def upload():
     template_id = "y0aI44dC"
     api_key = "424fdcb0088abe05a1bede5c"
 
-    for translation_dict in data:
+    for translation_dict in data.get("translations"):
         from_word = FromWord(**translation_dict["from_word"])
         to_words = [
             ToWord(**to_word) for to_word in translation_dict["to_words"]

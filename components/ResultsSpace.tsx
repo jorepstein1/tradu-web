@@ -7,17 +7,20 @@ import {
   UniqueIdentifier,
 } from "@dnd-kit/core";
 import { CardDropZone } from "./CardDropZone";
-import { Translation, TranslationCard } from "./TranslationCard";
+import { TranslationCard } from "./TranslationCard";
 import { useState } from "react";
+import { Translation } from "@/services/mochiApi";
 
 export const ResultsSpace = ({
   translations,
   selectedTranslationIds,
   setSelectedTranslationIds,
+  uploadSelectedTranslations,
 }: {
   translations: Translation[];
   selectedTranslationIds: Set<UniqueIdentifier>;
   setSelectedTranslationIds: (value: Set<UniqueIdentifier>) => void;
+  uploadSelectedTranslations: (translations: Translation[]) => void;
 }) => {
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
 
@@ -36,23 +39,6 @@ export const ResultsSpace = ({
   };
   const onDragStart = (event: DragStartEvent) => {
     setActiveId(event.active.id);
-  };
-  const uploadCards = () => {
-    const body = JSON.stringify(
-      translations.filter((translation) =>
-        selectedTranslationIds.has(translation.translation_id)
-      )
-    );
-    console.log("body", body);
-    const url = "http://localhost:3000/api/upload";
-    const response = fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json; charset=utf-8",
-      },
-      body: body,
-    }).then((response) => response.json());
-    console.log(response);
   };
 
   const activeTranslation = translations.find(
@@ -74,7 +60,17 @@ export const ResultsSpace = ({
             ))}
         </CardDropZone>
 
-        <CardDropZone id="to" header="Cards to Make" uploadCards={uploadCards}>
+        <CardDropZone
+          id="to"
+          header="Cards to Make"
+          uploadCards={() =>
+            uploadSelectedTranslations(
+              translations.filter((translation) =>
+                selectedTranslationIds.has(translation.translation_id)
+              )
+            )
+          }
+        >
           {translations
             .filter((translation) =>
               selectedTranslationIds.has(translation.translation_id)

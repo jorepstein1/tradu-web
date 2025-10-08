@@ -2,28 +2,34 @@
 import { useActionState, useState } from "react";
 import { SearchSection } from "@/components/HeaderAndSearchSpace";
 import { ResultsSpace } from "@/components/ResultsSpace";
-import { Translation } from "@/components/TranslationCard";
 import { UniqueIdentifier } from "@dnd-kit/core";
 import Cookies from "js-cookie";
 import { SettingsModalDialog } from "./SettingsModalDialog";
-const TRANSLATE_URL = "http://localhost:3000/api/translate";
+import {
+  Translation,
+  getTranslations,
+  uploadSelectedTranslations,
+} from "@/services/mochiApi";
 
-const getTranslations = async (
-  direction: string,
-  word: string
-): Promise<Translation[]> => {
-  const body = new URLSearchParams({ direction, word });
-  console.log("Body:", body.toString());
-  const url = `${TRANSLATE_URL}?${body.toString()}`;
-  return fetch(url)
-    .then((response) => response.json())
-    .then((json) => json.translations);
+const useCookie = (
+  cookieName: string
+): [string, (newValue: string) => void] => {
+  // Currently setting cookie to an empty string is a no-op
+  const [cookieValue, setCookie] = useState(Cookies.get(cookieName) || "");
+  return [
+    cookieValue,
+    (newValue: string) => {
+      setCookie(newValue);
+      Cookies.set(cookieName, newValue);
+    },
+  ];
 };
 
 export const Tradu = () => {
-  const savedMochiApiKey = Cookies.get("mochi-api-key") || "";
-  const savedMochiDeckId = Cookies.get("mochi-deck-id") || "";
-  const savedMochiTemplateId = Cookies.get("mochi-template-id") || "";
+  const [savedMochiApiKey, setSavedMochiApiKey] = useCookie("mochi-api-key");
+  const [savedMochiDeckId, setSavedMochiDeckId] = useCookie("mochi-deck-id");
+  const [savedMochiTemplateId, setSavedMochiTemplateId] =
+    useCookie("mochi-template-id");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [selectedTranslationIds, setSelectedTranslationIds] = useState<
     Set<UniqueIdentifier>
@@ -50,9 +56,10 @@ export const Tradu = () => {
     newMochiDeckId: string,
     newMochiTemplateId: string
   ) => {
-    Cookies.set("mochi-api-key", newMochiApiKey);
-    Cookies.set("mochi-deck-id", newMochiDeckId);
-    Cookies.set("mochi-template-id", newMochiTemplateId);
+    setSavedMochiApiKey(newMochiApiKey);
+    setSavedMochiDeckId(newMochiDeckId);
+    setSavedMochiTemplateId(newMochiTemplateId);
+    setSettingsOpen(false);
   };
   return (
     <div className="max-w-7xl mx-auto space-y-6 h-screen max-h-screen">
@@ -72,11 +79,12 @@ export const Tradu = () => {
           translations={translationResponse}
           selectedTranslationIds={selectedTranslationIds}
           setSelectedTranslationIds={setSelectedTranslationIds}
+          uploadSelectedTranslations={uploadSelectedTranslations}
         />
       </div>
       <SettingsModalDialog
         isOpen={settingsOpen}
-        onClose={() => {
+        setDialogClosed={() => {
           setSettingsOpen(false);
         }}
         savedMochiApiKey={savedMochiApiKey}
