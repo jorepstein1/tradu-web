@@ -42,11 +42,13 @@ export const getTranslations = async (
     .then((json) => json.translations);
 };
 
-export const uploadSelectedTranslations = (
+export const uploadSelectedTranslations = async (
+  mochiApiKey: string,
   selectedTranslations: Translation[]
 ) => {
   const body = JSON.stringify({
     translations: selectedTranslations,
+    mochiApiKey: mochiApiKey,
   });
   const url = "http://localhost:3000/api/upload";
   const response = fetch(url, {
@@ -56,7 +58,7 @@ export const uploadSelectedTranslations = (
     },
     body: body,
   }).then((response) => response.json());
-  console.log(response);
+  return response;
 };
 
 export const getMochiDecks = async (

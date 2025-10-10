@@ -13,6 +13,7 @@ import requests
 logging.basicConfig(filename="record.log", level=logging.DEBUG)
 app = Flask(__name__)
 MOCHI_BASE_URL = "https://app.mochi.cards/api"
+# api_key = "424fdcb0088abe05a1bede5c"
 
 
 @app.route("/api/translate")
@@ -36,9 +37,7 @@ def get_decks():
     if mochi_api_key is None:
         return "Must provide Mochi API Key", 400
 
-    response, code = make_mochi_request(
-        f"{MOCHI_BASE_URL}/decks", mochi_api_key
-    )
+    response, code = mochi_get(f"{MOCHI_BASE_URL}/decks", mochi_api_key)
     if code == 400:
         print("returning", response, code)
         return response, code
@@ -60,9 +59,7 @@ def get_templates():
     if mochi_api_key is None:
         return "Must provide Mochi API Key", 400
 
-    response, code = make_mochi_request(
-        f"{MOCHI_BASE_URL}/templates", mochi_api_key
-    )
+    response, code = mochi_get(f"{MOCHI_BASE_URL}/templates", mochi_api_key)
     if code == 400:
         print("returning", response, code)
         return response, code
@@ -82,30 +79,18 @@ def get_templates():
     return {"templates": templates}
 
 
-def make_mochi_request(url: str, api_key: str) -> tuple[dict, int]:
-    try:
-        response = requests.get(url, auth=(api_key, ""), timeout=10)
-    except requests.exceptions.RequestException as e:
-        print(f"Requests Exception: {e}")
-        return {"errors": str(e)}, 400
-
-    decks_data = response.json()
-    try:
-        response.raise_for_status()
-    except requests.exceptions.HTTPError as e:
-        if decks_data.get("errors"):
-            return decks_data, 400
-        else:
-            return {"errors": str(e)}, 400
-    return decks_data, 200
-
-
 @app.route("/api/upload", methods=["POST"])
 def upload():
     data = request.get_json()
+
+    mochi_api_key = data.get("mochiApiKey")
+    if mochi_api_key is None:
+        print("ÄSDFASDFASDFASDF")
+        return "Must provide Mochi API Key", 400
+
+    print(data)
     deck_id = "CjkJfr88"
     template_id = "y0aI44dC"
-    api_key = "424fdcb0088abe05a1bede5c"
 
     for translation_dict in data.get("translations"):
         from_word = FromWord(**translation_dict["from_word"])
@@ -124,13 +109,12 @@ def upload():
             "fields": make_fields(translation),
             "review-reverse?": True,
         }
-        resp = requests.post(
-            "https://app.mochi.cards/api/cards",
-            auth=(api_key, ""),
-            json=card_data,
-            timeout=10,
+        response, code = mochi_post(
+            f"{MOCHI_BASE_URL}/cards", mochi_api_key, data=card_data
         )
-        resp.raise_for_status()
+        if code == 400:
+            print("returning", response, code)
+            return response, code
     return {}
 
 
@@ -176,3 +160,40 @@ def make_fields(translation: Translation):
             "value": translation.to_words[0].sense,
         },
     }
+
+
+def mochi_get(url: str, mochi_api_key: str) -> tuple[dict, int]:
+    def make_request():
+        return requests.get(url, auth=(mochi_api_key, ""), timeout=10)
+
+    return make_mochi_request(make_request)
+
+
+def mochi_post(url: str, mochi_api_key: str, data: dict) -> tuple[dict, int]:
+    def make_request():
+        return requests.post(
+            url,
+            auth=(mochi_api_key, ""),
+            json=data,
+            timeout=10,
+        )
+
+    return make_mochi_request(make_request)
+
+
+def make_mochi_request(request_fn) -> tuple[dict, int]:
+    try:
+        response = request_fn()
+    except requests.exceptions.RequestException as e:
+        print(f"Requests Exception: {e}")
+        return {"errors": str(e)}, 400
+
+    decks_data = response.json()
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        if decks_data.get("errors"):
+            return decks_data, 400
+        else:
+            return {"errors": str(e)}, 400
+    return decks_data, 200

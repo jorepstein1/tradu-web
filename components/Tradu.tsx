@@ -79,7 +79,15 @@ export const Tradu = () => {
           translations={translationResponse}
           selectedTranslationIds={selectedTranslationIds}
           setSelectedTranslationIds={setSelectedTranslationIds}
-          uploadSelectedTranslations={uploadSelectedTranslations}
+          uploadSelectedTranslations={(selectedTranslationIds) =>
+            uploadSelectedTranslations(
+              savedMochiApiKey,
+              selectedTranslationIds
+            ).then(() => {
+              console.log("resetitng selected");
+              setSelectedTranslationIds(new Set());
+            })
+          }
         />
       </div>
       <SettingsModalDialog
