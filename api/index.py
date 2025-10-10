@@ -71,11 +71,12 @@ def get_templates():
                 "id": template_data["id"],
                 "name": template_data["name"],
                 "fields": [
-                    field_dict["name"]
+                    (field_dict["name"], field_dict["id"])
                     for field_dict in template_data["fields"].values()
                 ],
             }
         )
+    print(templates)
     return {"templates": templates}
 
 
@@ -91,6 +92,7 @@ def upload():
     print(data)
     deck_id = "CjkJfr88"
     template_id = "y0aI44dC"
+    template_id = "3ouJZnZR"
 
     for translation_dict in data.get("translations"):
         from_word = FromWord(**translation_dict["from_word"])
@@ -109,6 +111,7 @@ def upload():
             "fields": make_fields(translation),
             "review-reverse?": True,
         }
+        print(card_data)
         response, code = mochi_post(
             f"{MOCHI_BASE_URL}/cards", mochi_api_key, data=card_data
         )
@@ -129,37 +132,47 @@ def make_fields(translation: Translation):
     return {
         "name": {
             "id": "name",
-            "value": translation.from_word.text,
+            "value": make_card_url_front(translation.from_word),
         },
-        "rO9TxZAt": {  # from_text
-            "id": "rO9TxZAt",
-            "value": translation.from_word.text,
-        },
-        "yFwrtZsR": {  # from_definition
-            "id": "yFwrtZsR",
-            "value": translation.from_word.definition,
-        },
-        "pUfmNiwj": {  # from_part_of_speech
-            "id": "pUfmNiwj",
-            "value": translation.from_word.part_of_speech,
-        },
-        "kkCnoBnQ": {  # from_sense
-            "id": "kkCnoBnQ",
-            "value": translation.from_word.sense,
-        },
-        "ltjpE7Br": {  # to_text
-            "id": "ltjpE7Br",
-            "value": translation.to_words[0].text,
-        },
-        "DLAEgyqd": {  # to_part_of_speech
-            "id": "DLAEgyqd",
-            "value": translation.to_words[0].part_of_speech,
-        },
-        "jLEjCQU5": {  # to_sense
-            "id": "jLEjCQU5",
-            "value": translation.to_words[0].sense,
+        "V72yjxYh": {  # from_definition
+            "id": "V72yjxYh",
+            "value": make_card_url_back(translation.to_words),
         },
     }
+
+
+primary_style = ""
+secondary_style = "color: lab(47.7841 -0.393182 -10.0268); font-size: .75rem"
+
+
+def make_card_url_front(word: FromWord) -> str:
+    secondary_html = " "
+    if word.sense:
+        secondary_html += word.sense
+        if word.part_of_speech:
+            secondary_html += ", " + word.part_of_speech
+    elif word.part_of_speech:
+        secondary_html += word.part_of_speech
+    html = f'{word.text}<span style="{secondary_style}">{secondary_html}</span>'
+    return html
+
+
+def make_card_url_back(words: list[ToWord]) -> str:
+    translation_htmls = []
+    for word in words:
+        secondary_html = " "
+        if word.sense:
+            secondary_html += word.sense
+            if word.part_of_speech:
+                secondary_html += ", " + word.part_of_speech
+        elif word.part_of_speech:
+            secondary_html += word.part_of_speech
+        if secondary_html:
+            secondary_html = (
+                f'<span style="{secondary_style}">{secondary_html}</span>'
+            )
+        translation_htmls.append(f"{word.text}{secondary_html}")
+    return ", ".join(translation_htmls)
 
 
 def mochi_get(url: str, mochi_api_key: str) -> tuple[dict, int]:
