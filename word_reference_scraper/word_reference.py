@@ -1,6 +1,7 @@
 import curl_cffi
-from parsel import Selector
 import dataclasses
+from parsel import Selector
+import pprint
 
 
 @dataclasses.dataclass
@@ -19,10 +20,17 @@ class ToWord:
 
 
 @dataclasses.dataclass
+class Expression:
+    from_expression: str
+    to_expression: str
+
+
+@dataclasses.dataclass
 class Translation:
     translation_id: int
     from_word: FromWord
     to_words: list[ToWord]
+    expressions: list[Expression]
 
 
 def _sanitize_string(text: str) -> str:
@@ -38,6 +46,8 @@ def _sanitize_string(text: str) -> str:
 def make_translation_from_trs(trs: list[Selector], idx: int) -> Translation:
     from_word = None
     to_words = []
+    from_expressions = []
+    to_expressions = []
     for tr in trs:
         tds = tr.css("td")
         if len(tds) == 3:
@@ -78,6 +88,19 @@ def make_translation_from_trs(trs: list[Selector], idx: int) -> Translation:
             to_word = create_to_word(tds[1], tds[2])
             to_words.append(to_word)
         elif len(tds) == 2:
+            if tooltip := tds[1].css("span.tooltip"):
+                if tooltip.css("b::text").get() == "ⓘ":
+                    # there is some tooltip, probably explaining that this expression
+                    # is not a direct translation of other example expressions
+                    print(
+                        f"Skipping expression with tooltip: {tooltip.css('span::text').get()}"
+                    )
+                    continue
+            if tds[1].css(".FrEx"):
+                from_expressions.append(tds[1].css("span::text").get())
+            if tds[1].css(".ToEx"):
+                to_expressions.append(tds[1].css("td::text").get())
+            # if tds[1]
             # phrase translation
             pass
         elif len(tds) == 1:
@@ -88,9 +111,19 @@ def make_translation_from_trs(trs: list[Selector], idx: int) -> Translation:
 
     if from_word is None:
         raise ValueError("from_word should not be None")
-
+    expressions = []
+    if len(from_expressions) == 1 and len(to_expressions) == 1:
+        expressions.append(
+            Expression(
+                from_expression=from_expressions[0],
+                to_expression=to_expressions[0],
+            )
+        )
     return Translation(
-        from_word=from_word, to_words=to_words, translation_id=idx
+        from_word=from_word,
+        to_words=to_words,
+        translation_id=idx,
+        expressions=expressions,
     )
 
 
@@ -130,7 +163,7 @@ def translate_word(word: str, direction: str) -> bytes:
     return response.content
 
 
-def make_translations(html_content: str):
+def make_translations(html_content: str) -> list[Translation]:
     selector = Selector(html_content)
     tables = selector.css("table .WRD")
     # table ids can be regular, phrasal, additional, compounds
@@ -139,25 +172,31 @@ def make_translations(html_content: str):
     # ONLY PARSING "REGULAR" TABLE FOR NOW
     translation_trs = {"regular": []}
     for table in tables:
-        print("new table")
         if not table.css("td#regular"):
             continue
+        print("Processing 'regular' table.")
+
         cur_translation: list[Selector] = []
         trs = table.css("tr")
         for tr in trs:
             if tr.css(".langHeader") or tr.css(".wrtopsection"):
                 continue
             tr_id = tr.attrib.get("id")
+            # the first row of a translation always has an id
             if tr_id and (tr_id.startswith("enes") or tr_id.startswith("esen")):
-                print("new translation")
                 if cur_translation:
                     translation_trs["regular"].append(cur_translation)
                     cur_translation = []
             cur_translation.append(tr)
         translation_trs["regular"].append(cur_translation)
-    print(f"there are {len(translation_trs['regular'])} translations")
+    print(
+        f"    There are {len(translation_trs['regular'])} regular translations"
+    )
     translation_objs = []
     for idx, translation in enumerate(translation_trs["regular"]):
+        print(f"Processing translation {idx}")
+        translation_obj = make_translation_from_trs(translation, idx)
+        pprint.pprint(dataclasses.asdict(translation_obj))
         translation_objs.append(make_translation_from_trs(translation, idx))
         print("----")
     return translation_objs

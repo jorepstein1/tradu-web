@@ -50,7 +50,7 @@ export const TranslationCard = ({
     >
       <Card className={`cursor-move ${isDragging ? "opacity-50" : ""}`}>
         <CardContent className="p-4 border-border">
-          <div className="flex items-start justify-between gap-2 mb-2">
+          <div className="flex gap-2 mb-2">
             <span className="text-card-foreground font-medium">
               {translation.from_word.text}
             </span>
@@ -75,6 +75,11 @@ export const TranslationCard = ({
           <div className="mb-2 text-sm text-muted-foreground">
             {translation.from_word.definition}
           </div>
+          {translation.expressions.length && (
+            <div className="mb-2 text-sm text-muted-foreground italic">
+              {translation.expressions[0].from_expression}
+            </div>
+          )}
 
           <div className="mb-2 space-y-1">
             <span className="text-primary font-medium">→ </span>
@@ -99,6 +104,11 @@ export const TranslationCard = ({
                 </div>
               ))}
             </div>
+            {translation.expressions.length && (
+              <div className="mb-2 text-sm text-muted-foreground italic">
+                {translation.expressions[0].to_expression}
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

@@ -14,10 +14,15 @@ interface ToWord {
   part_of_speech: string;
   sense: string;
 }
+interface Expression {
+  from_expression: string;
+  to_expression: string;
+}
 export interface Translation {
   from_word: FromWord;
   to_words: ToWord[];
   translation_id: string;
+  expressions: Expression[];
 }
 export interface MochiDeck {
   id: string;

@@ -1,5 +1,6 @@
 from flask import Flask, request
 from word_reference_scraper.word_reference import (
+    Expression,
     FromWord,
     ToWord,
     Translation,
@@ -22,11 +23,12 @@ def translate():
     word = request.args.get("word")
     if direction is None or word is None:
         return "Must provide direction and word", 400
+    print(f"Translating word: {word}")
     wr_content = translate_word(word, direction).decode()
     translation_strings = [
         asdict(translation) for translation in make_translations(wr_content)
     ]
-    print(translation_strings)
+    print()
     return {"translations": translation_strings}
 
 
@@ -99,10 +101,15 @@ def upload():
         to_words = [
             ToWord(**to_word) for to_word in translation_dict["to_words"]
         ]
+        expressions = [
+            Expression(**expression)
+            for expression in translation_dict["expressions"]
+        ]
         translation = Translation(
             translation_id=translation_dict["translation_id"],
             from_word=from_word,
             to_words=to_words,
+            expressions=expressions,
         )
         card_data = {
             "content": "",
@@ -132,20 +139,29 @@ def make_fields(translation: Translation):
     return {
         "name": {
             "id": "name",
-            "value": make_card_url_front(translation.from_word),
+            "value": make_card_url_front(
+                translation.from_word, translation.expressions
+            ),
         },
         "V72yjxYh": {  # from_definition
             "id": "V72yjxYh",
-            "value": make_card_url_back(translation.to_words),
+            "value": make_card_url_back(
+                translation.to_words, translation.expressions
+            ),
         },
     }
 
 
-primary_style = ""
-secondary_style = "color: lab(47.7841 -0.393182 -10.0268); font-size: .75rem"
+primary_style = "font-size: 1.5rem"
+secondary_style = "color: lab(47.7841 -0.393182 -10.0268); font-size: .8rem"
+expression_style = "font-style: italic; font-size: .85rem"
 
 
-def make_card_url_front(word: FromWord) -> str:
+def sanitize_markdown(text: str) -> str:
+    return text.replace("- ", "\- ")
+
+
+def make_card_url_front(word: FromWord, expressions: list[Expression]) -> str:
     secondary_html = " "
     if word.sense:
         secondary_html += word.sense
@@ -153,14 +169,24 @@ def make_card_url_front(word: FromWord) -> str:
             secondary_html += ", " + word.part_of_speech
     elif word.part_of_speech:
         secondary_html += word.part_of_speech
-    html = f'{word.text}<span style="{secondary_style}">{secondary_html}</span>'
-    return html
+    text_div = f'<div>{word.text}<span style="{secondary_style}">{secondary_html}</span></div>'
+
+    expression_div = ""
+    if expressions:
+        expression_div = (
+            f'<div><span style="{expression_style}">'
+            f"{sanitize_markdown(expressions[0].from_expression)}</span></div>"
+        )
+
+    return f'<div style="{primary_style}">{text_div}{expression_div}</div>'
 
 
-def make_card_url_back(words: list[ToWord]) -> str:
+def make_card_url_back(
+    words: list[ToWord], expressions: list[Expression]
+) -> str:
     translation_htmls = []
     for word in words:
-        secondary_html = " "
+        secondary_html = ""
         if word.sense:
             secondary_html += word.sense
             if word.part_of_speech:
@@ -169,10 +195,18 @@ def make_card_url_back(words: list[ToWord]) -> str:
             secondary_html += word.part_of_speech
         if secondary_html:
             secondary_html = (
-                f'<span style="{secondary_style}">{secondary_html}</span>'
+                f' <span style="{secondary_style}">{secondary_html}</span>'
             )
         translation_htmls.append(f"{word.text}{secondary_html}")
-    return ", ".join(translation_htmls)
+    text_div = f"<div>{', '.join(translation_htmls)}</div>"
+
+    expression_div = ""
+    if expressions:
+        expression_div = (
+            f'<div><span style="{expression_style}">'
+            f"{sanitize_markdown(expressions[0].to_expression)}</span></div>"
+        )
+    return f'<div style="font-size: 1.2rem;">{text_div}{expression_div}</div>'
 
 
 def mochi_get(url: str, mochi_api_key: str) -> tuple[dict, int]:

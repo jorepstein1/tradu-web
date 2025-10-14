@@ -6,6 +6,10 @@ def test_hola():
         response_content = f.read()
     translations = word_reference.make_translations(response_content)
     assert len(translations) == 2
+    assert len(translations[0].to_words) == 3
+    assert len(translations[0].expressions) == 1
+    assert len(translations[1].to_words) == 1
+    assert len(translations[1].expressions) == 1
 
 
 def test_guau():
@@ -13,6 +17,8 @@ def test_guau():
         response_content = f.read()
     translations = word_reference.make_translations(response_content)
     assert len(translations) == 1
+    assert len(translations[0].to_words) == 2
+    assert len(translations[0].expressions) == 1
 
 
 def test_ball():
@@ -21,6 +27,12 @@ def test_ball():
         response_content = f.read()
     translations = word_reference.make_translations(response_content)
     assert len(translations) == 3
+    assert len(translations[0].to_words) == 1
+    assert len(translations[0].expressions) == 1
+    assert len(translations[1].to_words) == 2
+    assert len(translations[1].expressions) == 1
+    assert len(translations[2].to_words) == 1
+    assert len(translations[2].expressions) == 1
 
 
 def test_cool():
@@ -31,3 +43,13 @@ def test_cool():
     for translation in translations:
         print(translation)
     assert len(translations) == 5
+    assert len(translations[0].to_words) == 2
+    assert len(translations[0].expressions) == 0  # really 2
+    assert len(translations[1].to_words) == 2
+    assert len(translations[1].expressions) == 0  # really 1 from, 2 to
+    assert len(translations[2].to_words) == 2
+    assert len(translations[2].expressions) == 1
+    assert len(translations[3].to_words) == 4
+    assert len(translations[3].expressions) == 1
+    assert len(translations[4].to_words) == 1
+    assert len(translations[4].expressions) == 0
