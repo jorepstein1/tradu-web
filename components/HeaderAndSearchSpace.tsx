@@ -3,6 +3,7 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { ArrowLeftRight, Settings } from "lucide-react";
+import Image from "next/image";
 
 interface SearchSectionProps {
   searchAction: (formData: FormData) => void;
@@ -25,7 +26,9 @@ export const SearchSection: React.FC<SearchSectionProps> = ({
     <Card className="border-border bg-card">
       <CardContent className="p-6">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-card-foreground text-5xl">Traduz</h1>
+          <div className="flex items-center justify-between gap-3">
+          <Image src="/tradu_icon.png" alt="Logo" width={50} height={50} />
+          <h1 className="text-card-foreground text-5xl">Tradu</h1></div>
           <Button
             variant="outline"
             size="sm"
