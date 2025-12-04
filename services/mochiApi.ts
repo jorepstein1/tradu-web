@@ -2,7 +2,7 @@ const TRANSLATE_URL = "http://localhost:3000/api/translate";
 const LOAD_DECKS_URL = "http://localhost:3000/api/get-decks";
 const LOAD_TEMPLATES_URL = "http://localhost:3000/api/get-templates";
 
-export const REQUIRED_TEMPLATE_FIELDS = ["to_sense"];
+export const REQUIRED_TEMPLATE_FIELDS = ["Name", "Front", "Back"];
 interface FromWord {
   text: string;
   definition: string;
@@ -18,6 +18,10 @@ interface Expression {
   from_expression: string;
   to_expression: string;
 }
+interface Field {
+  name: string;
+  id: string;
+}
 export interface Translation {
   from_word: FromWord;
   to_words: ToWord[];
@@ -32,7 +36,7 @@ export interface MochiDeck {
 export interface MochiTemplate {
   id: string;
   name: string;
-  fields: string[];
+  fields: Field[];
 }
 
 export const getTranslations = async (
@@ -102,10 +106,10 @@ export const getMochiTemplates = async (
       return response.json() as Promise<{ templates: MochiTemplate[] }>;
     })
     .then((json) =>
-      json.templates.filter((template) =>
-        REQUIRED_TEMPLATE_FIELDS.every((field) =>
-          template.fields.includes(field)
-        )
-      )
+      json.templates.filter((template) => {
+        return REQUIRED_TEMPLATE_FIELDS.every((field) =>
+          template.fields.map((field) => field.name).includes(field)
+        );
+      })
     );
 };

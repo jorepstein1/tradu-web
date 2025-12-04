@@ -73,7 +73,7 @@ def get_templates():
                 "id": template_data["id"],
                 "name": template_data["name"],
                 "fields": [
-                    (field_dict["name"], field_dict["id"])
+                    {"name": field_dict["name"], "id": field_dict["id"]}
                     for field_dict in template_data["fields"].values()
                 ],
             }
