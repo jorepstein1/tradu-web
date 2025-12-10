@@ -1,6 +1,7 @@
-const TRANSLATE_URL = "http://localhost:3000/api/translate";
-const LOAD_DECKS_URL = "http://localhost:3000/api/get-decks";
-const LOAD_TEMPLATES_URL = "http://localhost:3000/api/get-templates";
+const TRANSLATE_URL = "/api/translate";
+const LOAD_DECKS_URL = "/api/get-decks";
+const LOAD_TEMPLATES_URL = "/api/get-templates";
+const UPLOAD_URL = "/api/upload";
 
 export const REQUIRED_TEMPLATE_FIELDS = ["Name", "Front", "Back"];
 interface FromWord {
@@ -59,8 +60,7 @@ export const uploadSelectedTranslations = async (
     translations: selectedTranslations,
     mochiApiKey: mochiApiKey,
   });
-  const url = "http://localhost:3000/api/upload";
-  const response = fetch(url, {
+  const response = fetch(UPLOAD_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json; charset=utf-8",
