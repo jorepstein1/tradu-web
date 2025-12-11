@@ -10,13 +10,16 @@ import { CardDropZone } from "./CardDropZone";
 import { TranslationCard } from "./TranslationCard";
 import { useState } from "react";
 import { Translation } from "@/services/mochiApi";
+import { BookOpen } from "lucide-react";
 
 export const ResultsSpace = ({
+  searchTerm,
   translations,
   selectedTranslationIds,
   setSelectedTranslationIds,
   uploadSelectedTranslations,
 }: {
+  searchTerm: string;
   translations: Translation[];
   selectedTranslationIds: Set<UniqueIdentifier>;
   setSelectedTranslationIds: (value: Set<UniqueIdentifier>) => void;
@@ -48,16 +51,36 @@ export const ResultsSpace = ({
     <DndContext onDragEnd={onDragEnd} onDragStart={onDragStart}>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <CardDropZone id="from" header="Search Results">
-          {translations
-            .filter((translation) => {
-              return !selectedTranslationIds.has(translation.translation_id);
-            })
-            .map((translation) => (
-              <TranslationCard
-                translation={translation}
-                key={translation.translation_id}
-              />
-            ))}
+          <ul>
+            {translations.length ? (
+              translations
+                .filter((translation) => {
+                  return !selectedTranslationIds.has(
+                    translation.translation_id
+                  );
+                })
+                .map((translation) => (
+                  <TranslationCard
+                    translation={translation}
+                    key={translation.translation_id}
+                  />
+                ))
+            ) : (
+              <div className="text-muted-foreground flex flex-col items-center py-12">
+                <BookOpen className="w-12 h-12 text-muted-foreground mb-3" />
+                <div>
+                  {searchTerm
+                    ? "No translations found"
+                    : "Search for a word to see translations"}
+                </div>
+                {searchTerm && (
+                  <div className="text-xs mt-1">
+                    Try searching for a different word
+                  </div>
+                )}
+              </div>
+            )}
+          </ul>
         </CardDropZone>
 
         <CardDropZone
@@ -71,16 +94,29 @@ export const ResultsSpace = ({
             )
           }
         >
-          {translations
-            .filter((translation) =>
-              selectedTranslationIds.has(translation.translation_id)
-            )
-            .map((translation) => (
-              <TranslationCard
-                translation={translation}
-                key={translation.translation_id}
-              />
-            ))}
+          {selectedTranslationIds.size ? (
+            <ul>
+              {translations
+                .filter((translation) =>
+                  selectedTranslationIds.has(translation.translation_id)
+                )
+                .map((translation) => (
+                  <TranslationCard
+                    translation={translation}
+                    key={translation.translation_id}
+                  />
+                ))}
+            </ul>
+          ) : (
+            <div className="flex flex-col items-center py-12 text-muted-foreground ">
+              <div className="mb-2">
+                Drag translation cards here to create flashcards
+              </div>
+              <div className="text-xs">
+                Cards will be uploaded to your selected Mochi deck
+              </div>
+            </div>
+          )}
         </CardDropZone>
         <DragOverlay>
           {activeTranslation ? (

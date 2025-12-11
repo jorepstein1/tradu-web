@@ -34,6 +34,7 @@ export const Tradu = () => {
   const [selectedTranslationIds, setSelectedTranslationIds] = useState<
     Set<UniqueIdentifier>
   >(() => new Set());
+  const [searchTerm, setSearchTerm] = useState("");
   const [translationDirection, setTranslationDirection] = useState("esen");
   const [translationResponse, searchAction, searchIsPending] = useActionState(
     async (_previousState: Translation[], formData: FormData) => {
@@ -41,6 +42,7 @@ export const Tradu = () => {
       if (typeof term !== "string") {
         return [];
       } else {
+        setSearchTerm(term);
         const translationResults = await getTranslations(
           translationDirection,
           term
@@ -76,6 +78,7 @@ export const Tradu = () => {
       </div>
       <div>
         <ResultsSpace
+          searchTerm={searchTerm}
           translations={translationResponse}
           selectedTranslationIds={selectedTranslationIds}
           setSelectedTranslationIds={setSelectedTranslationIds}
@@ -84,7 +87,6 @@ export const Tradu = () => {
               savedMochiApiKey,
               selectedTranslationIds
             ).then(() => {
-              console.log("resetitng selected");
               setSelectedTranslationIds(new Set());
             })
           }
