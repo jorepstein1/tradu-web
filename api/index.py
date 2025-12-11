@@ -88,7 +88,6 @@ def upload():
 
     mochi_api_key = data.get("mochiApiKey")
     if mochi_api_key is None:
-        print("ÄSDFASDFASDFASDF")
         return "Must provide Mochi API Key", 400
 
     print(data)
