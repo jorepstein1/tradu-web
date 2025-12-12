@@ -1,0 +1,17 @@
+[project]
+name = "word_reference_scraper"
+version = "0.1.0"
+description = "Package for scraping word reference translations"
+readme = "README.md"
+authors = [
+    { name = "Jordan Epstein", email = "jorepstein1@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "curl-cffi>=0.13.0",
+    "parsel>=1.10.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.9.17,<0.10.0"]
+build-backend = "uv_build"

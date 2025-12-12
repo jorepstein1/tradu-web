@@ -1,0 +1,17 @@
+[project]
+name = "tradu-web"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "flask>=3.1.2",
+    "requests>=2.32.5",
+    "word_reference_scraper",
+]
+
+[tool.uv.sources]
+word_reference_scraper = { workspace = true }
+
+[tool.uv.workspace]
+members = [
+    "word_reference_scraper",
+]
