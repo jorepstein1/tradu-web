@@ -93,6 +93,7 @@ export const ResultsSpace = ({
               )
             )
           }
+          uploadIsDisabled={selectedTranslationIds.size === 0}
         >
           {selectedTranslationIds.size ? (
             <ul>

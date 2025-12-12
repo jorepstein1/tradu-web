@@ -8,11 +8,13 @@ export const CardDropZone = ({
   children,
   header,
   uploadCards,
+  uploadIsDisabled,
 }: {
   id: string;
   header: string;
   children: React.ReactNode;
   uploadCards?: () => void;
+  uploadIsDisabled?: boolean;
 }) => {
   const { setNodeRef } = useDroppable({
     id: id,
@@ -21,7 +23,11 @@ export const CardDropZone = ({
     <Card className="border-border bg-card max-h-200" ref={setNodeRef}>
       <CardHeader className="flex items-center justify-between">
         {header}
-        {id == "to" ? <Button onClick={uploadCards}>Upload</Button> : null}
+        {id == "to" ? (
+          <Button disabled={uploadIsDisabled} onClick={uploadCards}>
+            Upload
+          </Button>
+        ) : null}
       </CardHeader>
       <CardContent className="overflow-y-auto">
         <ul>{children}</ul>
