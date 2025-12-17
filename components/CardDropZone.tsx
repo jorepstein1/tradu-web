@@ -2,6 +2,7 @@
 import React from "react";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import { Button } from "./ui/button";
+import { ScrollArea } from "./ui/scroll-area";
 import { useDroppable } from "@dnd-kit/core";
 export const CardDropZone = ({
   id,
@@ -20,7 +21,7 @@ export const CardDropZone = ({
     id: id,
   });
   return (
-    <Card className="border-border bg-card max-h-200" ref={setNodeRef}>
+    <Card ref={setNodeRef}>
       <CardHeader className="flex items-center justify-between">
         {header}
         {id == "to" ? (
@@ -29,8 +30,11 @@ export const CardDropZone = ({
           </Button>
         ) : null}
       </CardHeader>
-      <CardContent className="overflow-y-auto">
+      <CardContent >
+        <ScrollArea type="auto" className="h-[500px]  px-4">
         <ul>{children}</ul>
+
+        </ScrollArea>
       </CardContent>
     </Card>
   );
