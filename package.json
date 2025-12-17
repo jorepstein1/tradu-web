@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "flask-dev": "bash .venv/bin/activate && pip install -r requirements.txt && python3 -m flask --app api/index run -p 5328  --debug",
+    "flask-dev": "uv run -m flask --app api/index run -p 5328  --debug",
     "next-dev": "NODE_OPTIONS='--inspect --trace-deprecation' next dev --turbopack",
     "dev": "concurrently 'npm run next-dev' 'npm run flask-dev'",
     "build": "next build --turbopack",
