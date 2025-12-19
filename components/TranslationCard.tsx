@@ -75,7 +75,7 @@ export const TranslationCard = ({
           <div className="mb-2 text-sm text-muted-foreground">
             {translation.from_word.definition}
           </div>
-          {translation.expressions.length && (
+          {translation.expressions.length > 0 && (
             <div className="mb-2 text-sm text-muted-foreground italic">
               {translation.expressions[0].from_expression}
             </div>
@@ -104,7 +104,7 @@ export const TranslationCard = ({
                 </div>
               ))}
             </div>
-            {translation.expressions.length && (
+            {translation.expressions.length > 0 && (
               <div className="mb-2 text-sm text-muted-foreground italic">
                 {translation.expressions[0].to_expression}
               </div>

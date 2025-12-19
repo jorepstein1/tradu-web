@@ -32,7 +32,7 @@ export const CardDropZone = ({
       </CardHeader>
       <CardContent >
         <ScrollArea type="auto" className="h-[500px]  px-4">
-        <ul>{children}</ul>
+          <ul>{children}</ul>
 
         </ScrollArea>
       </CardContent>
