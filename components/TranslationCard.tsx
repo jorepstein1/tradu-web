@@ -4,27 +4,6 @@ import { useDraggable } from "@dnd-kit/core";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Translation } from "@/services/mochiApi";
-export const TranslationCardList = ({
-  translations,
-}: {
-  translations: Translation[];
-}) => {
-  return (
-    <DndContext>
-      <Card className="border-border bg-card">
-        <CardHeader>Search Results</CardHeader>
-        <CardContent>
-          {translations.map((translation) => (
-            <TranslationCard
-              translation={translation}
-              key={translation.translation_id}
-            />
-          ))}
-        </CardContent>
-      </Card>
-    </DndContext>
-  );
-};
 
 export const TranslationCard = ({
   translation,
