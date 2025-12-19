@@ -35,12 +35,6 @@ export const TranslationCard = ({
     id: translation.translation_id,
   });
 
-  // className={`cursor-move transition-opacity ${
-  //   isDragging ? "opacity-50" : ""
-  //   }`}
-  //   className={`border-border bg-card ${
-  //   !isDragging ? "hover:bg-sidebar-accent" : ""
-  // }`}
   return (
     <li
       ref={setNodeRef}
