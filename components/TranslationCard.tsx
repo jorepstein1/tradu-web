@@ -1,14 +1,74 @@
 "use client";
-import { DndContext } from "@dnd-kit/core";
+import React, { useState } from 'react';
 import { useDraggable } from "@dnd-kit/core";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Translation } from "@/services/mochiApi";
+import { X } from 'lucide-react';
+
+const DeletablePart = ({
+  children,
+  onDelete
+}: {
+  children: React.ReactNode;
+  onDelete: () => void;
+}) => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <div
+      className={`relative inline-block`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {children}
+      {isHovered && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete();
+          }}
+          className="absolute -top-1 -right-1 w-4 h-4 bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded-full flex items-center justify-center shadow-md transition-all"
+          aria-label="Delete"
+        >
+          <X className="w-3 h-3" />
+        </button>
+      )}
+    </div>
+  );
+};
+
+const Expression = ({
+  children,
+  isEditable,
+  onDelete
+}: {
+  children: React.ReactNode;
+  isEditable: boolean;
+  onDelete: () => void;
+}) => {
+  return (<>
+    {isEditable ? (
+      <DeletablePart onDelete={onDelete}>
+        <div className="mb-2 text-sm text-muted-foreground italic">
+          {children}
+        </div>
+      </DeletablePart>
+    ) : (
+      <div className="mb-2 text-sm text-muted-foreground italic">
+        {children}
+      </div>
+    )}
+  </> );
+
+}
 
 export const TranslationCard = ({
   translation,
+  isEditable
 }: {
-  translation: Translation;
+    translation: Translation;
+    isEditable: boolean;
 }) => {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: translation.translation_id,
@@ -49,9 +109,9 @@ export const TranslationCard = ({
             {translation.from_word.definition}
           </div>
           {translation.expressions.length > 0 && (
-            <div className="mb-2 text-sm text-muted-foreground italic">
+            <Expression isEditable={isEditable} onDelete={() => { }}>
               {translation.expressions[0].from_expression}
-            </div>
+            </Expression>
           )}
 
           <div className="mb-2 space-y-1">
@@ -78,9 +138,9 @@ export const TranslationCard = ({
               ))}
             </div>
             {translation.expressions.length > 0 && (
-              <div className="mb-2 text-sm text-muted-foreground italic">
-                {translation.expressions[0].to_expression}
-              </div>
+            <Expression isEditable={isEditable} onDelete={() => { }}>
+              {translation.expressions[0].to_expression}
+            </Expression>
             )}
           </div>
         </CardContent>

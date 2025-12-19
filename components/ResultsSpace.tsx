@@ -63,6 +63,7 @@ export const ResultsSpace = ({
                   <TranslationCard
                     translation={translation}
                     key={translation.translation_id}
+                    isEditable={false}
                   />
                 ))
             ) : (
@@ -105,6 +106,7 @@ export const ResultsSpace = ({
                   <TranslationCard
                     translation={translation}
                     key={translation.translation_id}
+                    isEditable={true}
                   />
                 ))}
             </ul>
@@ -124,6 +126,7 @@ export const ResultsSpace = ({
             <TranslationCard
               translation={activeTranslation}
               key={activeTranslation.translation_id}
+              isEditable={false}
             />
           ) : null}
         </DragOverlay>
