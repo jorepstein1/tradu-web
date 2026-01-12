@@ -34,6 +34,9 @@ export const Tradu = () => {
   const [selectedTranslationIds, setSelectedTranslationIds] = useState<
     Set<UniqueIdentifier>
   >(() => new Set());
+  const [modifiedTranslations, setModifiedTranslations] = useState<
+    Translation[]
+  >([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [translationDirection, setTranslationDirection] = useState("esen");
   const [translationResponse, searchAction, searchIsPending] = useActionState(
@@ -48,6 +51,7 @@ export const Tradu = () => {
           term
         );
         setSelectedTranslationIds(new Set());
+        setModifiedTranslations(translationResults);
         return translationResults;
       }
     },
@@ -80,13 +84,28 @@ export const Tradu = () => {
         <ResultsSpace
           searchTerm={searchTerm}
           translations={translationResponse}
+          modifiedTranslations={modifiedTranslations}
+          setModifiedTranslations={setModifiedTranslations}
           selectedTranslationIds={selectedTranslationIds}
           setSelectedTranslationIds={setSelectedTranslationIds}
-          uploadSelectedTranslations={(selectedTranslationIds) =>
+          uploadSelectedTranslations={(selectedTranslationsToUpload) =>
             uploadSelectedTranslations(
               savedMochiApiKey,
-              selectedTranslationIds
+              selectedTranslationsToUpload
             ).then(() => {
+              // Reset modified translations back to originals for uploaded cards
+              const uploadedIds = new Set(
+                selectedTranslationsToUpload.map((t) => t.translation_id)
+              );
+              setModifiedTranslations(
+                modifiedTranslations.map((t) =>
+                  uploadedIds.has(t.translation_id)
+                    ? (translationResponse.find(
+                        (orig) => orig.translation_id === t.translation_id
+                      ) ?? t)
+                    : t
+                )
+              );
               setSelectedTranslationIds(new Set());
             })
           }

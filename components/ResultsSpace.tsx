@@ -15,17 +15,66 @@ import { BookOpen } from "lucide-react";
 export const ResultsSpace = ({
   searchTerm,
   translations,
+  modifiedTranslations,
+  setModifiedTranslations,
   selectedTranslationIds,
   setSelectedTranslationIds,
   uploadSelectedTranslations,
 }: {
   searchTerm: string;
   translations: Translation[];
+  modifiedTranslations: Translation[];
+  setModifiedTranslations: (translations: Translation[]) => void;
   selectedTranslationIds: Set<UniqueIdentifier>;
   setSelectedTranslationIds: (value: Set<UniqueIdentifier>) => void;
   uploadSelectedTranslations: (translations: Translation[]) => void;
 }) => {
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
+
+  const updateTranslation = (
+    translationId: string,
+    updater: (t: Translation) => Translation
+  ) => {
+    setModifiedTranslations(
+      modifiedTranslations.map((t) =>
+        t.translation_id === translationId ? updater(t) : t
+      )
+    );
+  };
+
+  const deleteFromExpression = (translationId: string) => {
+    updateTranslation(translationId, (t) => ({
+      ...t,
+      expressions:
+        t.expressions.length > 0
+          ? [{ ...t.expressions[0], from_expression: "" }]
+          : [],
+    }));
+  };
+
+  const deleteToExpression = (translationId: string) => {
+    updateTranslation(translationId, (t) => ({
+      ...t,
+      expressions:
+        t.expressions.length > 0
+          ? [{ ...t.expressions[0], to_expression: "" }]
+          : [],
+    }));
+  };
+
+  const resetTranslation = (translationId: string) => {
+    const original = translations.find((t) => t.translation_id === translationId);
+    if (original) {
+      updateTranslation(translationId, () => original);
+    }
+  };
+
+  const hasChanges = (translationId: string): boolean => {
+    const original = translations.find((t) => t.translation_id === translationId);
+    const modified = modifiedTranslations.find((t) => t.translation_id === translationId);
+    if (!original || !modified) return false;
+    return JSON.stringify(original) !== JSON.stringify(modified);
+  };
 
   const onDragEnd = (event: DragEndEvent) => {
     const { over } = event;
@@ -33,6 +82,8 @@ export const ResultsSpace = ({
       const resultsCopy = new Set(selectedTranslationIds);
       if (over.id == "from") {
         resultsCopy.delete(event.active.id);
+        // Reset the translation to original when dragging back
+        resetTranslation(event.active.id as string);
       } else {
         resultsCopy.add(event.active.id);
       }
@@ -63,6 +114,7 @@ export const ResultsSpace = ({
                   <TranslationCard
                     translation={translation}
                     key={translation.translation_id}
+                    isEditable={false}
                   />
                 ))
             ) : (
@@ -88,7 +140,7 @@ export const ResultsSpace = ({
           header="Cards to Make"
           uploadCards={() =>
             uploadSelectedTranslations(
-              translations.filter((translation) =>
+              modifiedTranslations.filter((translation) =>
                 selectedTranslationIds.has(translation.translation_id)
               )
             )
@@ -97,7 +149,7 @@ export const ResultsSpace = ({
         >
           {selectedTranslationIds.size ? (
             <ul>
-              {translations
+              {modifiedTranslations
                 .filter((translation) =>
                   selectedTranslationIds.has(translation.translation_id)
                 )
@@ -105,6 +157,15 @@ export const ResultsSpace = ({
                   <TranslationCard
                     translation={translation}
                     key={translation.translation_id}
+                    isEditable={true}
+                    onDeleteFromExpression={() =>
+                      deleteFromExpression(translation.translation_id)
+                    }
+                    onDeleteToExpression={() =>
+                      deleteToExpression(translation.translation_id)
+                    }
+                    onReset={() => resetTranslation(translation.translation_id)}
+                    hasChanges={hasChanges(translation.translation_id)}
                   />
                 ))}
             </ul>
@@ -124,6 +185,7 @@ export const ResultsSpace = ({
             <TranslationCard
               translation={activeTranslation}
               key={activeTranslation.translation_id}
+              isEditable={false}
             />
           ) : null}
         </DragOverlay>
