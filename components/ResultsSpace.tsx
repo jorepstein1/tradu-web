@@ -15,12 +15,16 @@ import { BookOpen } from "lucide-react";
 export const ResultsSpace = ({
   searchTerm,
   translations,
+  modifiedTranslations,
+  setModifiedTranslations,
   selectedTranslationIds,
   setSelectedTranslationIds,
   uploadSelectedTranslations,
 }: {
   searchTerm: string;
   translations: Translation[];
+  modifiedTranslations: Translation[];
+  setModifiedTranslations: (translations: Translation[]) => void;
   selectedTranslationIds: Set<UniqueIdentifier>;
   setSelectedTranslationIds: (value: Set<UniqueIdentifier>) => void;
   uploadSelectedTranslations: (translations: Translation[]) => void;
@@ -98,7 +102,7 @@ export const ResultsSpace = ({
         >
           {selectedTranslationIds.size ? (
             <ul>
-              {translations
+              {modifiedTranslations
                 .filter((translation) =>
                   selectedTranslationIds.has(translation.translation_id)
                 )

@@ -21,6 +21,7 @@ class ToWord:
 
 @dataclasses.dataclass
 class Expression:
+    expression_id: int
     from_expression: str
     to_expression: str
 
@@ -115,6 +116,7 @@ def make_translation_from_trs(trs: list[Selector], idx: int) -> Translation:
     if len(from_expressions) == 1 and len(to_expressions) == 1:
         expressions.append(
             Expression(
+                expression_id=1,
                 from_expression=from_expressions[0],
                 to_expression=to_expressions[0],
             )

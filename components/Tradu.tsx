@@ -34,6 +34,9 @@ export const Tradu = () => {
   const [selectedTranslationIds, setSelectedTranslationIds] = useState<
     Set<UniqueIdentifier>
   >(() => new Set());
+  const [modifiedTranslations, setModifiedTranslations] = useState<
+    Translation[]
+  >([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [translationDirection, setTranslationDirection] = useState("esen");
   const [translationResponse, searchAction, searchIsPending] = useActionState(
@@ -80,6 +83,8 @@ export const Tradu = () => {
         <ResultsSpace
           searchTerm={searchTerm}
           translations={translationResponse}
+          modifiedTranslations={modifiedTranslations}
+          setModifiedTranslations={setModifiedTranslations}
           selectedTranslationIds={selectedTranslationIds}
           setSelectedTranslationIds={setSelectedTranslationIds}
           uploadSelectedTranslations={(selectedTranslationIds) =>
