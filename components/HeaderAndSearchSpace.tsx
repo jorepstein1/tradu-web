@@ -72,7 +72,7 @@ export const SearchSection: React.FC<SearchSectionProps> = ({
             <Button
               type="submit"
               disabled={loading || !searchTerm.trim()}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground"
+              className="bg-green-600 hover:bg-green-700 text-white disabled:bg-muted disabled:text-muted-foreground"
               formAction={searchAction}
             >
               {loading ? "Searching..." : "Search"}

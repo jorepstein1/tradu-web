@@ -25,7 +25,11 @@ export const CardDropZone = ({
       <CardHeader className="flex items-center justify-between">
         {header}
         {id == "to" ? (
-          <Button disabled={uploadIsDisabled} onClick={uploadCards}>
+          <Button 
+            disabled={uploadIsDisabled} 
+            onClick={uploadCards}
+            className="bg-green-600 hover:bg-green-700 text-white disabled:bg-muted disabled:text-muted-foreground"
+          >
             Upload
           </Button>
         ) : null}
