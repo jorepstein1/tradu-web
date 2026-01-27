@@ -1,3 +1,10 @@
+"""WordReference HTML parser for extracting translations.
+
+This module scrapes and parses WordReference.com translation pages to extract
+structured translation data including words, definitions, parts of speech, and
+example expressions.
+"""
+
 import curl_cffi
 import dataclasses
 from parsel import Selector
@@ -6,6 +13,15 @@ import pprint
 
 @dataclasses.dataclass
 class FromWord:
+    """Represents the source word being translated.
+
+    Attributes:
+        text: The source word text (e.g., "hello")
+        definition: The word's definition (e.g., "greeting")
+        part_of_speech: Grammatical category (e.g., "interj" for interjection)
+        sense: Additional context or qualifier (e.g., "informal")
+    """
+
     text: str
     definition: str
     part_of_speech: str
@@ -14,6 +30,14 @@ class FromWord:
 
 @dataclasses.dataclass
 class ToWord:
+    """Represents a target translation word.
+
+    Attributes:
+        text: The translated word text (e.g., "hola")
+        part_of_speech: Grammatical category (e.g., "interj" for interjection)
+        sense: Translation qualifier or context (e.g., "informal")
+    """
+
     text: str
     part_of_speech: str
     sense: str
@@ -21,6 +45,14 @@ class ToWord:
 
 @dataclasses.dataclass
 class Expression:
+    """Represents an example phrase showing word usage.
+
+    Attributes:
+        expression_id: Unique identifier for this expression
+        from_expression: Example phrase in source language
+        to_expression: Translated example phrase in target language
+    """
+
     expression_id: int
     from_expression: str
     to_expression: str
@@ -28,6 +60,15 @@ class Expression:
 
 @dataclasses.dataclass
 class Translation:
+    """Complete translation entry with source word, target words, and examples.
+
+    Attributes:
+        translation_id: Unique identifier for this translation entry
+        from_word: The source word being translated
+        to_words: List of possible translations in target language
+        expressions: List of example phrases demonstrating usage
+    """
+
     translation_id: int
     from_word: FromWord
     to_words: list[ToWord]
@@ -35,6 +76,14 @@ class Translation:
 
 
 def _sanitize_string(text: str) -> str:
+    """Remove leading/trailing whitespace and wrapping parentheses.
+
+    Args:
+        text: String to sanitize
+
+    Returns:
+        Sanitized string with stripped whitespace and outer parentheses removed
+    """
     text = text.strip()
     if text:
         if text[0] == "(":
@@ -45,10 +94,27 @@ def _sanitize_string(text: str) -> str:
 
 
 def make_translation_from_trs(trs: list[Selector], idx: int) -> Translation:
-    from_word = None
-    to_words = []
-    from_expressions = []
-    to_expressions = []
+    """Parse a group of table rows into a Translation object.
+
+    Processes a sequence of HTML table rows (<tr>) that represent a single
+    translation entry in WordReference. Extracts the source word, target
+    translations, and example expressions.
+
+    Args:
+        trs: List of Selector objects representing table rows for one translation
+        idx: Translation ID number
+
+    Returns:
+        Translation object containing parsed data
+
+    Raises:
+        ValueError: If required elements (from_word, definition, to_text) are missing
+                   or if table structure is unrecognized
+    """
+    from_word: FromWord | None = None
+    to_words: list[ToWord] = []
+    from_expressions: list[str] = []
+    to_expressions: list[str] = []
     for tr in trs:
         tds = tr.css("td")
         if len(tds) == 3:
@@ -98,9 +164,11 @@ def make_translation_from_trs(trs: list[Selector], idx: int) -> Translation:
                     )
                     continue
             if tds[1].css(".FrEx"):
-                from_expressions.append(tds[1].css("span::text").get())
+                if from_expr := tds[1].css("span::text").get():
+                    from_expressions.append(from_expr)
             if tds[1].css(".ToEx"):
-                to_expressions.append(tds[1].css("td::text").get())
+                if to_expr := tds[1].css("td::text").get():
+                    to_expressions.append(to_expr)
             # if tds[1]
             # phrase translation
             pass
@@ -112,7 +180,7 @@ def make_translation_from_trs(trs: list[Selector], idx: int) -> Translation:
 
     if from_word is None:
         raise ValueError("from_word should not be None")
-    expressions = []
+    expressions: list[Expression] = []
     if len(from_expressions) == 1 and len(to_expressions) == 1:
         expressions.append(
             Expression(
@@ -129,7 +197,19 @@ def make_translation_from_trs(trs: list[Selector], idx: int) -> Translation:
     )
 
 
-def create_to_word(td1, td2) -> ToWord:
+def create_to_word(td1: Selector, td2: Selector) -> ToWord:
+    """Extract a ToWord object from two table cell Selectors.
+
+    Args:
+        td1: First table cell containing definition and sense information
+        td2: Second table cell (ToWrd class) containing translated word and POS
+
+    Returns:
+        ToWord object with extracted translation data
+
+    Raises:
+        ValueError: If td2 doesn't have ToWrd class or to_text is None
+    """
     dsense_text = td1.css("span span::text").get() or ""
     to_td = td2
     if not to_td.attrib.get("class") == "ToWrd":
@@ -152,6 +232,19 @@ def create_to_word(td1, td2) -> ToWord:
 
 
 def translate_word(word: str, direction: str) -> bytes:
+    """Fetch HTML content from WordReference for a given word and direction.
+
+    Args:
+        word: The word to translate
+        direction: Translation direction - "enes" for English→Spanish,
+                  "esen" for Spanish→English
+
+    Returns:
+        Raw HTML content as bytes from the WordReference page
+
+    Raises:
+        ValueError: If direction is not "enes" or "esen"
+    """
     if direction == "enes":
         url = (
             f"https://www.wordreference.com/es/translation.asp?tranword={word}"
@@ -166,13 +259,26 @@ def translate_word(word: str, direction: str) -> bytes:
 
 
 def make_translations(html_content: str) -> list[Translation]:
+    """Parse WordReference HTML into a list of Translation objects.
+
+    Extracts translation data from WordReference's "regular" translation table.
+    Currently does not parse phrasal verbs, compound forms, or additional
+    translations sections.
+
+    Args:
+        html_content: Raw HTML string from WordReference page
+
+    Returns:
+        List of Translation objects, one for each translation entry found
+        in the "regular" translations table
+    """
     selector = Selector(html_content)
     tables = selector.css("table .WRD")
     # table ids can be regular, phrasal, additional, compounds
     # I've found an example where there can be two regular tables
 
     # ONLY PARSING "REGULAR" TABLE FOR NOW
-    translation_trs = {"regular": []}
+    translation_trs: dict[str, list[list[Selector]]] = {"regular": []}
     for table in tables:
         if not table.css("td#regular"):
             continue
@@ -194,7 +300,7 @@ def make_translations(html_content: str) -> list[Translation]:
     print(
         f"    There are {len(translation_trs['regular'])} regular translations"
     )
-    translation_objs = []
+    translation_objs: list[Translation] = []
     for idx, translation in enumerate(translation_trs["regular"]):
         print(f"Processing translation {idx}")
         translation_obj = make_translation_from_trs(translation, idx)
