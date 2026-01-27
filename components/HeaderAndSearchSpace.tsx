@@ -27,8 +27,9 @@ export const SearchSection: React.FC<SearchSectionProps> = ({
       <CardContent className="p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center justify-between gap-3">
-          <Image src="/tradu_icon.png" alt="Logo" width={50} height={50} />
-          <h1 className="text-card-foreground text-5xl">Tradu</h1></div>
+            <Image src="/tradu_icon.png" alt="Logo" width={50} height={50} />
+            <h1 className="text-card-foreground text-5xl">Tradu</h1>
+          </div>
           <Button
             variant="outline"
             size="sm"

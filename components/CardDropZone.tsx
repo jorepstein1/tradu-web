@@ -25,8 +25,8 @@ export const CardDropZone = ({
       <CardHeader className="flex items-center justify-between">
         {header}
         {id == "to" ? (
-          <Button 
-            disabled={uploadIsDisabled} 
+          <Button
+            disabled={uploadIsDisabled}
             onClick={uploadCards}
             className="bg-green-600 hover:bg-green-700 text-white disabled:bg-muted disabled:text-muted-foreground"
           >
@@ -34,10 +34,9 @@ export const CardDropZone = ({
           </Button>
         ) : null}
       </CardHeader>
-      <CardContent >
+      <CardContent>
         <ScrollArea type="auto" className="h-[500px]  px-4">
           <ul>{children}</ul>
-
         </ScrollArea>
       </CardContent>
     </Card>
