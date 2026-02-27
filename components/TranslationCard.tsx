@@ -9,15 +9,17 @@ import { X, RotateCcw } from "lucide-react";
 const DeletablePart = ({
   children,
   onDelete,
+  className = "inline-block",
 }: {
   children: React.ReactNode;
   onDelete: () => void;
+  className?: string;
 }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
     <div
-      className={`relative inline-block`}
+      className={`relative ${className}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -69,15 +71,13 @@ const Expression = ({
 export const TranslationCard = ({
   translation,
   isEditable,
-  onDeleteFromExpression,
-  onDeleteToExpression,
+  onUpdate,
   onReset,
   hasChanges,
 }: {
   translation: Translation;
   isEditable: boolean;
-  onDeleteFromExpression?: () => void;
-  onDeleteToExpression?: () => void;
+  onUpdate?: (updater: (t: Translation) => Translation) => void;
   onReset?: () => void;
   hasChanges?: boolean;
 }) => {
@@ -100,20 +100,55 @@ export const TranslationCard = ({
                 {translation.from_word.text}
               </span>
               <div className="flex gap-1 flex-wrap">
-                <Badge
-                  variant="outline"
-                  className="text-xs border-border text-muted-foreground"
-                >
-                  {translation.from_word.part_of_speech}
-                </Badge>
-                {translation.from_word.sense && (
+                {isEditable ? (
+                  <DeletablePart
+                    onDelete={() =>
+                      onUpdate?.((t) => ({
+                        ...t,
+                        from_word: { ...t.from_word, part_of_speech: "" },
+                      }))
+                    }
+                  >
+                    <Badge
+                      variant="outline"
+                      className="text-xs border-border text-muted-foreground"
+                    >
+                      {translation.from_word.part_of_speech}
+                    </Badge>
+                  </DeletablePart>
+                ) : (
                   <Badge
                     variant="outline"
                     className="text-xs border-border text-muted-foreground"
                   >
-                    {translation.from_word.sense}
+                    {translation.from_word.part_of_speech}
                   </Badge>
                 )}
+                {translation.from_word.sense &&
+                  (isEditable ? (
+                    <DeletablePart
+                      onDelete={() =>
+                        onUpdate?.((t) => ({
+                          ...t,
+                          from_word: { ...t.from_word, sense: "" },
+                        }))
+                      }
+                    >
+                      <Badge
+                        variant="outline"
+                        className="text-xs border-border text-muted-foreground"
+                      >
+                        {translation.from_word.sense}
+                      </Badge>
+                    </DeletablePart>
+                  ) : (
+                    <Badge
+                      variant="outline"
+                      className="text-xs border-border text-muted-foreground"
+                    >
+                      {translation.from_word.sense}
+                    </Badge>
+                  ))}
               </div>
             </div>
             {isEditable && hasChanges && onReset && (
@@ -133,14 +168,40 @@ export const TranslationCard = ({
             )}
           </div>
 
-          <div className="mb-2 text-sm text-muted-foreground">
-            {translation.from_word.definition}
-          </div>
+          {translation.from_word.definition &&
+            (isEditable ? (
+              <DeletablePart
+                className="block"
+                onDelete={() =>
+                  onUpdate?.((t) => ({
+                    ...t,
+                    from_word: { ...t.from_word, definition: "" },
+                  }))
+                }
+              >
+                <div className="mb-2 text-sm text-muted-foreground">
+                  {translation.from_word.definition}
+                </div>
+              </DeletablePart>
+            ) : (
+              <div className="mb-2 text-sm text-muted-foreground">
+                {translation.from_word.definition}
+              </div>
+            ))}
+
           {translation.expressions.length > 0 &&
             translation.expressions[0].from_expression && (
               <Expression
                 isEditable={isEditable}
-                onDelete={() => onDeleteFromExpression?.()}
+                onDelete={() =>
+                  onUpdate?.((t) => ({
+                    ...t,
+                    expressions:
+                      t.expressions.length > 0
+                        ? [{ ...t.expressions[0], from_expression: "" }]
+                        : [],
+                  }))
+                }
               >
                 {translation.expressions[0].from_expression}
               </Expression>
@@ -149,31 +210,57 @@ export const TranslationCard = ({
           <div className="mb-2 space-y-1">
             <span className="text-primary font-medium">→ </span>
             <div className="flex flex-wrap gap-2">
-              {translation.to_words.map((to_word, index) => (
-                <div key={index}>
-                  <span className="text-primary font-medium">
-                    {to_word.text + " "}
-                  </span>
-                  {(to_word.part_of_speech || to_word.sense) && (
-                    <span className="text-xs text-muted-foreground">
-                      (
-                      {[to_word.part_of_speech, to_word.sense]
-                        .filter(Boolean)
-                        .join(", ")}
-                      )
+              {translation.to_words.map((to_word, index) => {
+                const wordContent = (
+                  <>
+                    <span className="text-primary font-medium">
+                      {to_word.text + " "}
                     </span>
-                  )}
-                  {index < translation.to_words.length - 1 && (
-                    <span className="text-muted-foreground">,</span>
-                  )}
-                </div>
-              ))}
+                    {(to_word.part_of_speech || to_word.sense) && (
+                      <span className="text-xs text-muted-foreground">
+                        (
+                        {[to_word.part_of_speech, to_word.sense]
+                          .filter(Boolean)
+                          .join(", ")}
+                        )
+                      </span>
+                    )}
+                    {index < translation.to_words.length - 1 && (
+                      <span className="text-muted-foreground">,</span>
+                    )}
+                  </>
+                );
+
+                return isEditable ? (
+                  <DeletablePart
+                    key={to_word.text}
+                    onDelete={() =>
+                      onUpdate?.((t) => ({
+                        ...t,
+                        to_words: t.to_words.filter((_, i) => i !== index),
+                      }))
+                    }
+                  >
+                    {wordContent}
+                  </DeletablePart>
+                ) : (
+                  <div key={to_word.text}>{wordContent}</div>
+                );
+              })}
             </div>
             {translation.expressions.length > 0 &&
               translation.expressions[0].to_expression && (
                 <Expression
                   isEditable={isEditable}
-                  onDelete={() => onDeleteToExpression?.()}
+                  onDelete={() =>
+                    onUpdate?.((t) => ({
+                      ...t,
+                      expressions:
+                        t.expressions.length > 0
+                          ? [{ ...t.expressions[0], to_expression: "" }]
+                          : [],
+                    }))
+                  }
                 >
                   {translation.expressions[0].to_expression}
                 </Expression>

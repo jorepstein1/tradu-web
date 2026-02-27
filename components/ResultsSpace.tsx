@@ -42,26 +42,6 @@ export const ResultsSpace = ({
     );
   };
 
-  const deleteFromExpression = (translationId: string) => {
-    updateTranslation(translationId, (t) => ({
-      ...t,
-      expressions:
-        t.expressions.length > 0
-          ? [{ ...t.expressions[0], from_expression: "" }]
-          : [],
-    }));
-  };
-
-  const deleteToExpression = (translationId: string) => {
-    updateTranslation(translationId, (t) => ({
-      ...t,
-      expressions:
-        t.expressions.length > 0
-          ? [{ ...t.expressions[0], to_expression: "" }]
-          : [],
-    }));
-  };
-
   const resetTranslation = (translationId: string) => {
     const original = translations.find((t) => t.translation_id === translationId);
     if (original) {
@@ -158,11 +138,8 @@ export const ResultsSpace = ({
                     translation={translation}
                     key={translation.translation_id}
                     isEditable={true}
-                    onDeleteFromExpression={() =>
-                      deleteFromExpression(translation.translation_id)
-                    }
-                    onDeleteToExpression={() =>
-                      deleteToExpression(translation.translation_id)
+                    onUpdate={(updater) =>
+                      updateTranslation(translation.translation_id, updater)
                     }
                     onReset={() => resetTranslation(translation.translation_id)}
                     hasChanges={hasChanges(translation.translation_id)}
