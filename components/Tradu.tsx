@@ -20,7 +20,7 @@ const useCookie = (
     cookieValue,
     (newValue: string) => {
       setCookie(newValue);
-      Cookies.set(cookieName, newValue);
+      Cookies.set(cookieName, newValue, { expires: 365 });
     },
   ];
 };
