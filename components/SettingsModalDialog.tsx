@@ -138,6 +138,13 @@ export const SettingsModalDialog = ({
             Enter your Mochi Cards API Key to configure Tradu
           </DialogDescription>
         </DialogHeader>
+        <form
+          id="mochi-settings-form"
+          onSubmit={(e) => {
+            e.preventDefault();
+            onSaveSettings(mochiApiKey, mochiDeckId, mochiTemplateId);
+          }}
+        >
         <div className="space-y-4">
           <div className="space-y-2">
             <Label
@@ -151,6 +158,8 @@ export const SettingsModalDialog = ({
               <Input
                 id="apiKey"
                 type="password"
+                name="password"
+                autoComplete="current-password"
                 placeholder="Enter your Mochi API key"
                 value={mochiApiKey}
                 onChange={(e) => setMochiApiKey(e.target.value)}
@@ -275,16 +284,16 @@ export const SettingsModalDialog = ({
             <></>
           )}
         </div>
+        </form>
 
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
             Close
           </Button>
           <Button
+            type="submit"
+            form="mochi-settings-form"
             variant="outline"
-            onClick={() =>
-              onSaveSettings(mochiApiKey, mochiDeckId, mochiTemplateId)
-            }
           >
             Save Settings
           </Button>

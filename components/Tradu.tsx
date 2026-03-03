@@ -26,7 +26,7 @@ const useCookie = (
 };
 
 export const Tradu = () => {
-  const [savedMochiApiKey, setSavedMochiApiKey] = useCookie("mochi-api-key");
+  const [savedMochiApiKey, setSavedMochiApiKey] = useState("");
   const [savedMochiDeckId, setSavedMochiDeckId] = useCookie("mochi-deck-id");
   const [savedMochiTemplateId, setSavedMochiTemplateId] =
     useCookie("mochi-template-id");
