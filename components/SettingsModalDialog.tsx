@@ -50,7 +50,7 @@ export const SettingsModalDialog = ({
   onSaveSettings: (
     newMochiApiKey: string,
     newMochiDeckId: string,
-    newMochiTemplateId: string
+    newMochiTemplateId: string,
   ) => void;
 }) => {
   const [mochiApiKey, setMochiApiKey] = useState(savedMochiApiKey);
@@ -145,156 +145,153 @@ export const SettingsModalDialog = ({
             onSaveSettings(mochiApiKey, mochiDeckId, mochiTemplateId);
           }}
         >
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label
-              htmlFor="apiKey"
-              className="flex items-center gap-2 text-card-foreground"
-            >
-              <Key className="w-4 h-4" />
-              Mochi API Key
-            </Label>
-            <div className="flex gap-2">
-              <Input
-                id="apiKey"
-                type="password"
-                name="password"
-                autoComplete="current-password"
-                placeholder="Enter your Mochi API key"
-                value={mochiApiKey}
-                onChange={(e) => setMochiApiKey(e.target.value)}
-                className="flex-1 border-border bg-input-background text-card-foreground placeholder:text-muted-foreground"
-              />
-              <Button
-                onClick={loadMochiData}
-                disabled={!mochiApiKey.trim()}
-                size="sm"
-                className="bg-primary hover:bg-primary/90 text-primary-foreground"
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label
+                htmlFor="apiKey"
+                className="flex items-center gap-2 text-card-foreground"
               >
-                Connect
-              </Button>
-            </div>
-            {curError && (
-              <Alert variant="destructive" className="border-destructive/50">
-                <AlertDescription className="text-destructive-foreground">
-                  {curError}
-                </AlertDescription>
-              </Alert>
-            )}
-          </div>
-          {hasLoadedApiKey ? (
-            <div className="space-y-4 border border-border rounded-md p-3 bg-input-background">
-              <div className="space-y-2">
-                <Label
-                  htmlFor="deck"
-                  className="flex items-center gap-2 text-card-foreground"
+                <Key className="w-4 h-4" />
+                Mochi API Key
+              </Label>
+              <div className="flex gap-2">
+                <Input
+                  id="apiKey"
+                  type="password"
+                  name="password"
+                  autoComplete="current-password"
+                  placeholder="Enter your Mochi API key"
+                  value={mochiApiKey}
+                  onChange={(e) => setMochiApiKey(e.target.value)}
+                  className="flex-1 border-border bg-input-background text-card-foreground placeholder:text-muted-foreground"
+                />
+                <Button
+                  onClick={loadMochiData}
+                  type="button"
+                  disabled={!mochiApiKey.trim()}
+                  size="sm"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground"
                 >
-                  Select Deck
-                </Label>
-                <Select value={mochiDeckId} onValueChange={setMochiDeckId}>
-                  <SelectTrigger className="border-border bg-input-background text-card-foreground">
-                    <SelectValue placeholder="Choose a deck..." />
-                  </SelectTrigger>
-                  <SelectContent className="bg-popover border-border w-full max-w-[400px]">
-                    {decks.map((deck) => (
-                      <SelectItem
-                        key={deck.id}
-                        value={deck.id}
-                        className="text-popover-foreground whitespace-normal py-2 h-auto"
-                      >
-                        <div className="w-full">{deck.name}</div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  Connect
+                </Button>
               </div>
-              <div className="space-y-2">
-                <Label
-                  htmlFor="template"
-                  className="flex items-center gap-2 text-card-foreground"
-                >
-                  Select Template
-                </Label>
+              {curError && (
+                <Alert variant="destructive" className="border-destructive/50">
+                  <AlertDescription className="text-destructive-foreground">
+                    {curError}
+                  </AlertDescription>
+                </Alert>
+              )}
+            </div>
+            {hasLoadedApiKey ? (
+              <div className="space-y-4 border border-border rounded-md p-3 bg-input-background">
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="deck"
+                    className="flex items-center gap-2 text-card-foreground"
+                  >
+                    Select Deck
+                  </Label>
+                  <Select value={mochiDeckId} onValueChange={setMochiDeckId}>
+                    <SelectTrigger className="border-border bg-input-background text-card-foreground">
+                      <SelectValue placeholder="Choose a deck..." />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover border-border w-full max-w-[400px]">
+                      {decks.map((deck) => (
+                        <SelectItem
+                          key={deck.id}
+                          value={deck.id}
+                          className="text-popover-foreground whitespace-normal py-2 h-auto"
+                        >
+                          <div className="w-full">{deck.name}</div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="template"
+                    className="flex items-center gap-2 text-card-foreground"
+                  >
+                    Select Template
+                  </Label>
 
-                <div className="border border-border rounded-md p-3 bg-input-background">
-                  <div className="flex items-center gap-2 mb-2">
-                    {hasCompatibleTemplates ? (
-                      <>
-                        <Check className="w-4 h-4 text-accent" />
-                        <span className="text-card-foreground">
-                          Suitable template found
-                        </span>
-                      </>
-                    ) : (
-                      <>
-                        <X className="w-4 h-4 text-destructive" />
-                        <span className="text-card-foreground">
-                          No suitable template found
-                        </span>
-                      </>
+                  <div className="border border-border rounded-md p-3 bg-input-background">
+                    <div className="flex items-center gap-2 mb-2">
+                      {hasCompatibleTemplates ? (
+                        <>
+                          <Check className="w-4 h-4 text-accent" />
+                          <span className="text-card-foreground">
+                            Suitable template found
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <X className="w-4 h-4 text-destructive" />
+                          <span className="text-card-foreground">
+                            No suitable template found
+                          </span>
+                        </>
+                      )}
+                    </div>
+
+                    {hasCompatibleTemplates && (
+                      <Select
+                        value={mochiTemplateId}
+                        onValueChange={setMochiTemplateId}
+                      >
+                        <SelectTrigger className="border-border bg-background text-card-foreground">
+                          <SelectValue placeholder="Choose a template..." />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover border-border w-full max-w-[400px]">
+                          {compatibleTemplates.map((template) => (
+                            <SelectItem
+                              key={template.id}
+                              value={template.id}
+                              className="text-popover-foreground"
+                            >
+                              <div className="w-full">{template.name}</div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+
+                    {!hasCompatibleTemplates && (
+                      <div className="text-xs text-muted-foreground">
+                        Templates must contain:{" "}
+                        {REQUIRED_TEMPLATE_FIELDS.join(", ")}
+                        <Button
+                          onClick={handleCreateTemplate}
+                          disabled={creatingTemplate}
+                          size="sm"
+                          variant="outline"
+                          className="w-full border-border text-card-foreground hover:bg-sidebar-accent"
+                        >
+                          {creatingTemplate ? (
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          ) : (
+                            <Plus className="w-4 h-4 mr-2" />
+                          )}
+                          {creatingTemplate ? "Creating..." : "Create Template"}
+                        </Button>
+                      </div>
                     )}
                   </div>
-
-                  {hasCompatibleTemplates && (
-                    <Select
-                      value={mochiTemplateId}
-                      onValueChange={setMochiTemplateId}
-                    >
-                      <SelectTrigger className="border-border bg-background text-card-foreground">
-                        <SelectValue placeholder="Choose a template..." />
-                      </SelectTrigger>
-                      <SelectContent className="bg-popover border-border w-full max-w-[400px]">
-                        {compatibleTemplates.map((template) => (
-                          <SelectItem
-                            key={template.id}
-                            value={template.id}
-                            className="text-popover-foreground"
-                          >
-                            <div className="w-full">{template.name}</div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-
-                  {!hasCompatibleTemplates && (
-                    <div className="text-xs text-muted-foreground">
-                      Templates must contain:{" "}
-                      {REQUIRED_TEMPLATE_FIELDS.join(", ")}
-                      <Button
-                        onClick={handleCreateTemplate}
-                        disabled={creatingTemplate}
-                        size="sm"
-                        variant="outline"
-                        className="w-full border-border text-card-foreground hover:bg-sidebar-accent"
-                      >
-                        {creatingTemplate ? (
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        ) : (
-                          <Plus className="w-4 h-4 mr-2" />
-                        )}
-                        {creatingTemplate ? "Creating..." : "Create Template"}
-                      </Button>
-                    </div>
-                  )}
                 </div>
               </div>
-            </div>
-          ) : (
-            <></>
-          )}
-        </div>
+            ) : (
+              <></>
+            )}
+          </div>
         </form>
 
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
             Close
           </Button>
-          <Button
-            type="submit"
-            form="mochi-settings-form"
-            variant="outline"
-          >
+          <Button type="submit" form="mochi-settings-form" variant="outline">
             Save Settings
           </Button>
         </DialogFooter>
