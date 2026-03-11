@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="2 2 116 116" width="200" height="200">
+
+  <!-- Speech bubble - violet -->
+  <rect x="8" y="8" width="68" height="50" rx="10" ry="10"
+        fill="none" stroke="#7B5EA7" stroke-width="7.5" stroke-linejoin="round"/>
+  <!-- Bubble tail -->
+  <polyline points="20,58 14,74 34,62"
+            fill="none" stroke="#7B5EA7" stroke-width="7.5" stroke-linejoin="round" stroke-linecap="round"/>
+
+  <!-- Flashcard - blue -->
+  <rect x="44" y="62" width="68" height="50" rx="10" ry="10"
+        fill="none" stroke="#2D6A9F" stroke-width="7.5" stroke-linejoin="round"/>
+  <!-- Lines on flashcard - teal -->
+  <line x1="56" y1="80" x2="100" y2="80" stroke="#2AAFA0" stroke-width="5" stroke-linecap="round"/>
+  <line x1="56" y1="93" x2="88" y2="93" stroke="#2AAFA0" stroke-width="5" stroke-linecap="round"/>
+
+</svg>
