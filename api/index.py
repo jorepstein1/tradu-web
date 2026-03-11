@@ -14,7 +14,6 @@ import requests
 logging.basicConfig(filename="record.log", level=logging.DEBUG)
 app = Flask(__name__)
 MOCHI_BASE_URL = "https://app.mochi.cards/api"
-# api_key = "424fdcb0088abe05a1bede5c"
 
 
 @app.route("/api/translate")
