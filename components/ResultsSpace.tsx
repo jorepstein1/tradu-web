@@ -33,25 +33,31 @@ export const ResultsSpace = ({
 
   const updateTranslation = (
     translationId: string,
-    updater: (t: Translation) => Translation
+    updater: (t: Translation) => Translation,
   ) => {
     setModifiedTranslations(
       modifiedTranslations.map((t) =>
-        t.translation_id === translationId ? updater(t) : t
-      )
+        t.translation_id === translationId ? updater(t) : t,
+      ),
     );
   };
 
   const resetTranslation = (translationId: string) => {
-    const original = translations.find((t) => t.translation_id === translationId);
+    const original = translations.find(
+      (t) => t.translation_id === translationId,
+    );
     if (original) {
       updateTranslation(translationId, () => original);
     }
   };
 
   const hasChanges = (translationId: string): boolean => {
-    const original = translations.find((t) => t.translation_id === translationId);
-    const modified = modifiedTranslations.find((t) => t.translation_id === translationId);
+    const original = translations.find(
+      (t) => t.translation_id === translationId,
+    );
+    const modified = modifiedTranslations.find(
+      (t) => t.translation_id === translationId,
+    );
     if (!original || !modified) return false;
     return JSON.stringify(original) !== JSON.stringify(modified);
   };
@@ -76,18 +82,18 @@ export const ResultsSpace = ({
   };
 
   const activeTranslation = translations.find(
-    (translation) => translation.translation_id == activeId
+    (translation) => translation.translation_id == activeId,
   );
   return (
     <DndContext onDragEnd={onDragEnd} onDragStart={onDragStart}>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <CardDropZone id="from" header="Search Results">
           <ul>
             {translations.length ? (
               translations
                 .filter((translation) => {
                   return !selectedTranslationIds.has(
-                    translation.translation_id
+                    translation.translation_id,
                   );
                 })
                 .map((translation) => (
@@ -121,8 +127,8 @@ export const ResultsSpace = ({
           uploadCards={() =>
             uploadSelectedTranslations(
               modifiedTranslations.filter((translation) =>
-                selectedTranslationIds.has(translation.translation_id)
-              )
+                selectedTranslationIds.has(translation.translation_id),
+              ),
             )
           }
           uploadIsDisabled={selectedTranslationIds.size === 0}
@@ -131,7 +137,7 @@ export const ResultsSpace = ({
             <ul>
               {modifiedTranslations
                 .filter((translation) =>
-                  selectedTranslationIds.has(translation.translation_id)
+                  selectedTranslationIds.has(translation.translation_id),
                 )
                 .map((translation) => (
                   <TranslationCard
