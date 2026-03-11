@@ -1,41 +1,38 @@
-# Tradu Web
+# Tradu
 
-A web application for translating words and creating flashcards for language learning. Built with Next.js and Flask.
+<img src="public/tradu_icon.svg" alt="Tradu icon" width="80" />
 
-## Features
+A web app for looking up translations and turning them into flashcards. Available at [traducards.app](https://www.traducards.app).
 
-- Word translation using WordReference
-- Integration with Mochi Cards for flashcard creation
-- Support for multiple translation directions (e.g., English-Spanish)
-- Drag-and-drop interface for selecting translations
-- Card template and deck management
+## What it does
 
-## Development Setup
+1. **Search** — Enter a word; the app fetches translations from WordReference
+2. **Browse** — See translations with definitions, parts of speech, and example expressions
+3. **Select** — Drag translations into your card queue; edit or remove fields as needed
+4. **Upload** — Send the cards to your [Mochi Cards](https://mochi.cards) account via API
 
-### Prerequisites for local deployment
+Configure your Mochi API key, deck, and template in the settings menu.
+
+## Tech
+
+- **Frontend**: Next.js / React / TypeScript / Tailwind CSS
+- **Backend**: Flask (Python) — scrapes WordReference and talks to the Mochi API
+
+## Local development
+
+### Prerequisites
 
 - Node.js and npm
-- Python 3.12 virtual environment with pip
+- Python 3.12 with pip
 
-### Running the Application
+### Running locally
 
-1. **Start the Flask backend:**
-
+1. Start the Flask backend:
    ```bash
    npm run flask-dev
    ```
 
-2. **Start the Next.js frontend:**
+2. Start the Next.js frontend:
    ```bash
    npm run next-dev
    ```
-
-## How It Works
-
-1. **Search**: Enter a word to translate using the WordReference scraper
-2. **Review**: Browse translation results with definitions, parts of speech, and example expressions
-3. **Select**: Choose which translations to convert into flashcards
-4. **Configure**: Set up Mochi Cards API key, deck, and template through the settings
-5. **Upload**: Create flashcards in your Mochi Cards account
-
-The app scrapes translation data from WordReference and formats it for use with Mochi Cards, a spaced repetition flashcard system.
