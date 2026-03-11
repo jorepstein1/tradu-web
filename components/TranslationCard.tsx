@@ -100,30 +100,31 @@ export const TranslationCard = ({
                 {translation.from_word.text}
               </span>
               <div className="flex gap-1 flex-wrap">
-                {isEditable ? (
-                  <DeletablePart
-                    onDelete={() =>
-                      onUpdate?.((t) => ({
-                        ...t,
-                        from_word: { ...t.from_word, part_of_speech: "" },
-                      }))
-                    }
-                  >
+                {translation.from_word.part_of_speech &&
+                  (isEditable ? (
+                    <DeletablePart
+                      onDelete={() =>
+                        onUpdate?.((t) => ({
+                          ...t,
+                          from_word: { ...t.from_word, part_of_speech: "" },
+                        }))
+                      }
+                    >
+                      <Badge
+                        variant="outline"
+                        className="text-xs border-border text-muted-foreground"
+                      >
+                        {translation.from_word.part_of_speech}
+                      </Badge>
+                    </DeletablePart>
+                  ) : (
                     <Badge
                       variant="outline"
                       className="text-xs border-border text-muted-foreground"
                     >
                       {translation.from_word.part_of_speech}
                     </Badge>
-                  </DeletablePart>
-                ) : (
-                  <Badge
-                    variant="outline"
-                    className="text-xs border-border text-muted-foreground"
-                  >
-                    {translation.from_word.part_of_speech}
-                  </Badge>
-                )}
+                  ))}
                 {translation.from_word.sense &&
                   (isEditable ? (
                     <DeletablePart
@@ -171,7 +172,7 @@ export const TranslationCard = ({
           {translation.from_word.definition &&
             (isEditable ? (
               <DeletablePart
-                className="block"
+                className="block w-fit"
                 onDelete={() =>
                   onUpdate?.((t) => ({
                     ...t,
