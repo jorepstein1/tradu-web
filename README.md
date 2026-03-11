@@ -1,6 +1,4 @@
-# Tradu
-
-<img src="public/tradu_icon.svg" alt="Tradu icon" width="80" />
+# <img src="public/tradu_icon.svg" alt="Tradu icon" width="80" /> Tradu
 
 A web app for looking up translations and turning them into flashcards. Available at [traducards.app](https://www.traducards.app).
 
@@ -23,7 +21,7 @@ Configure your Mochi API key, deck, and template in the settings menu.
 ### Prerequisites
 
 - Node.js and npm
-- Python 3.12 with pip
+- Python 3.12 with uv
 
 ### Running locally
 
