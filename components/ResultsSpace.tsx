@@ -81,7 +81,7 @@ export const ResultsSpace = ({
     setActiveId(event.active.id);
   };
 
-  const activeTranslation = translations.find(
+  const activeTranslation = modifiedTranslations.find(
     (translation) => translation.translation_id == activeId,
   );
   return (
