@@ -2,6 +2,11 @@ from word_reference_scraper import word_reference
 
 
 def test_hola():
+    """
+    Test the es->en translation of "hola". "hola" has principal translations,
+    additional translations, and compound forms. The "¡hola!" "from" word has a
+    sense (informal).
+    """
     with open("./tests/html_translation_samples/hola.html", encoding="utf-8") as f:
         response_content = f.read()
     translations = word_reference.make_translations(response_content)
@@ -13,6 +18,10 @@ def test_hola():
 
 
 def test_guau():
+    """
+    Test the es->en translation of "guau". "guau" has one principal translation
+    and two additional translations.
+    """
     with open("./tests/html_translation_samples/guau.html", "r", encoding="utf-8") as f:
         response_content = f.read()
     translations = word_reference.make_translations(response_content)
@@ -22,6 +31,10 @@ def test_guau():
 
 
 def test_ball():
+    """
+    Test the translation of "ball". "ball" has principal translations,
+    additional translations, locuciones verbales, and many compound forms.
+    """
     # TODO add support for compound forms
     with open("./tests/html_translation_samples/ball.html", "r", encoding="utf-8") as f:
         response_content = f.read()
@@ -36,6 +49,12 @@ def test_ball():
 
 
 def test_tarada():
+    """
+    Test the translation of "tarada". "tarada" has principal translations,
+    additional translations, and a second set of principal translations. The
+    "to" word expressions has parantheses in it, which caused an issue with
+    parsing.
+    """
     with open("./tests/html_translation_samples/tarada.html", encoding="utf-8") as f:
         response_content = f.read()
     translations = word_reference.make_translations(response_content)
@@ -57,6 +76,14 @@ def test_tarada():
 
 
 def test_cool():
+    """
+    Test the translation of "cool". "cool" has principal translations,
+    additional translations, locuciones verbales, and compound forms. 
+    
+    One of "cool"'s translations, the interjection, has multiple "to" words and
+    these "to" words all have different "senses." E.g. informal, (AmC, CO, 
+    EV, VE: coloquial), or (ES: coloquial).
+    """
     with open("./tests/html_translation_samples/cool.html", "r", encoding="utf-8") as f:
         response_content = f.read()
     translations = word_reference.make_translations(response_content)
