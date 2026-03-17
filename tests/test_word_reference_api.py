@@ -68,6 +68,7 @@ def test_tarada():
     assert len(translations[2].expressions) == 1
     assert len(translations[3].to_words) == 2
     assert len(translations[3].expressions) == 1
+    assert translations[3].expressions[0].to_expression == "Only a jerk (or:  moron) goes out without an umbrella when it's raining."
     assert len(translations[4].to_words) == 2
     assert len(translations[4].expressions) == 1
     assert translations[5].from_word.text == "tarar"
