@@ -44,21 +44,6 @@ class ToWord:
 
 
 @dataclasses.dataclass
-class Expression:
-    """Represents an example phrase showing word usage.
-
-    Attributes:
-        expression_id: Unique identifier for this expression
-        from_expression: Example phrase in source language
-        to_expression: Translated example phrase in target language
-    """
-
-    expression_id: int
-    from_expression: str
-    to_expression: str
-
-
-@dataclasses.dataclass
 class Translation:
     """Complete translation entry with source word, target words, and examples.
 
@@ -66,13 +51,15 @@ class Translation:
         translation_id: Unique identifier for this translation entry
         from_word: The source word being translated
         to_words: List of possible translations in target language
-        expressions: List of example phrases demonstrating usage
+        from_expressions: Example phrases in the source language
+        to_expressions: Example phrases in the target language
     """
 
     translation_id: int
     from_word: FromWord
     to_words: list[ToWord]
-    expressions: list[Expression]
+    from_expressions: list[str]
+    to_expressions: list[str]
 
 
 def _sanitize_string(text: str) -> str:
@@ -180,20 +167,12 @@ def make_translation_from_trs(trs: list[Selector], idx: int) -> Translation:
 
     if from_word is None:
         raise ValueError("from_word should not be None")
-    expressions: list[Expression] = []
-    if len(from_expressions) == 1 and len(to_expressions) == 1:
-        expressions.append(
-            Expression(
-                expression_id=1,
-                from_expression=from_expressions[0],
-                to_expression=to_expressions[0],
-            )
-        )
     return Translation(
         from_word=from_word,
         to_words=to_words,
         translation_id=idx,
-        expressions=expressions,
+        from_expressions=from_expressions,
+        to_expressions=to_expressions,
     )
 
 

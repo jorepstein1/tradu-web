@@ -1,6 +1,5 @@
 from flask import Flask, request
 from word_reference_scraper.word_reference import (
-    Expression,
     FromWord,
     ToWord,
     Translation,
@@ -99,15 +98,12 @@ def upload():
         to_words = [
             ToWord(**to_word) for to_word in translation_dict["to_words"]
         ]
-        expressions = [
-            Expression(**expression)
-            for expression in translation_dict["expressions"]
-        ]
         translation = Translation(
             translation_id=translation_dict["translation_id"],
             from_word=from_word,
             to_words=to_words,
-            expressions=expressions,
+            from_expressions=translation_dict["from_expressions"],
+            to_expressions=translation_dict["to_expressions"],
         )
         card_data = {
             "content": "",
@@ -138,13 +134,13 @@ def make_fields(translation: Translation):
         "name": {
             "id": "name",
             "value": make_card_url_front(
-                translation.from_word, translation.expressions
+                translation.from_word, translation.from_expressions
             ),
         },
         "V72yjxYh": {  # from_definition
             "id": "V72yjxYh",
             "value": make_card_url_back(
-                translation.to_words, translation.expressions
+                translation.to_words, translation.to_expressions
             ),
         },
     }
@@ -159,7 +155,7 @@ def sanitize_markdown(text: str) -> str:
     return text.replace("- ", "\- ")
 
 
-def make_card_url_front(word: FromWord, expressions: list[Expression]) -> str:
+def make_card_url_front(word: FromWord, from_expressions: list[str]) -> str:
     secondary_html = " "
     if word.sense:
         secondary_html += word.sense
@@ -169,18 +165,16 @@ def make_card_url_front(word: FromWord, expressions: list[Expression]) -> str:
         secondary_html += word.part_of_speech
     text_div = f'<div>{word.text}<span style="{secondary_style}">{secondary_html}</span></div>'
 
-    expression_div = ""
-    if expressions:
-        expression_div = (
-            f'<div><span style="{expression_style}">'
-            f"{sanitize_markdown(expressions[0].from_expression)}</span></div>"
-        )
+    expression_div = "".join(
+        f'<div><span style="{expression_style}">{sanitize_markdown(expr)}</span></div>'
+        for expr in from_expressions
+    )
 
     return f'<div style="{primary_style}">{text_div}{expression_div}</div>'
 
 
 def make_card_url_back(
-    words: list[ToWord], expressions: list[Expression]
+    words: list[ToWord], to_expressions: list[str]
 ) -> str:
     translation_htmls = []
     for word in words:
@@ -198,12 +192,10 @@ def make_card_url_back(
         translation_htmls.append(f"{word.text}{secondary_html}")
     text_div = f"<div>{', '.join(translation_htmls)}</div>"
 
-    expression_div = ""
-    if expressions:
-        expression_div = (
-            f'<div><span style="{expression_style}">'
-            f"{sanitize_markdown(expressions[0].to_expression)}</span></div>"
-        )
+    expression_div = "".join(
+        f'<div><span style="{expression_style}">{sanitize_markdown(expr)}</span></div>'
+        for expr in to_expressions
+    )
     return f'<div style="font-size: 1.2rem;">{text_div}{expression_div}</div>'
 
 

@@ -190,23 +190,20 @@ export const TranslationCard = ({
               </div>
             ))}
 
-          {translation.expressions.length > 0 &&
-            translation.expressions[0].from_expression && (
-              <Expression
-                isEditable={isEditable}
-                onDelete={() =>
-                  onUpdate?.((t) => ({
-                    ...t,
-                    expressions:
-                      t.expressions.length > 0
-                        ? [{ ...t.expressions[0], from_expression: "" }]
-                        : [],
-                  }))
-                }
-              >
-                {translation.expressions[0].from_expression}
-              </Expression>
-            )}
+          {translation.from_expressions.map((expr, i) => (
+            <Expression
+              key={i}
+              isEditable={isEditable}
+              onDelete={() =>
+                onUpdate?.((t) => ({
+                  ...t,
+                  from_expressions: t.from_expressions.filter((_, j) => j !== i),
+                }))
+              }
+            >
+              {expr}
+            </Expression>
+          ))}
 
           <div className="mb-2 space-y-1">
             <span className="text-primary font-medium">→ </span>
@@ -249,23 +246,20 @@ export const TranslationCard = ({
                 );
               })}
             </div>
-            {translation.expressions.length > 0 &&
-              translation.expressions[0].to_expression && (
-                <Expression
-                  isEditable={isEditable}
-                  onDelete={() =>
-                    onUpdate?.((t) => ({
-                      ...t,
-                      expressions:
-                        t.expressions.length > 0
-                          ? [{ ...t.expressions[0], to_expression: "" }]
-                          : [],
-                    }))
-                  }
-                >
-                  {translation.expressions[0].to_expression}
-                </Expression>
-              )}
+            {translation.to_expressions.map((expr, i) => (
+              <Expression
+                key={i}
+                isEditable={isEditable}
+                onDelete={() =>
+                  onUpdate?.((t) => ({
+                    ...t,
+                    to_expressions: t.to_expressions.filter((_, j) => j !== i),
+                  }))
+                }
+              >
+                {expr}
+              </Expression>
+            ))}
           </div>
         </CardContent>
       </Card>

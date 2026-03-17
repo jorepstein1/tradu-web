@@ -12,9 +12,11 @@ def test_hola():
     translations = word_reference.make_translations(response_content)
     assert len(translations) == 2
     assert len(translations[0].to_words) == 3
-    assert len(translations[0].expressions) == 1
+    assert len(translations[0].from_expressions) == 1
+    assert len(translations[0].to_expressions) == 1
     assert len(translations[1].to_words) == 1
-    assert len(translations[1].expressions) == 1
+    assert len(translations[1].from_expressions) == 1
+    assert len(translations[1].to_expressions) == 1
 
 
 def test_guau():
@@ -27,7 +29,8 @@ def test_guau():
     translations = word_reference.make_translations(response_content)
     assert len(translations) == 1
     assert len(translations[0].to_words) == 2
-    assert len(translations[0].expressions) == 1
+    assert len(translations[0].from_expressions) == 1
+    assert len(translations[0].to_expressions) == 1
 
 
 def test_ball():
@@ -41,11 +44,14 @@ def test_ball():
     translations = word_reference.make_translations(response_content)
     assert len(translations) == 3
     assert len(translations[0].to_words) == 1
-    assert len(translations[0].expressions) == 1
+    assert len(translations[0].from_expressions) == 1
+    assert len(translations[0].to_expressions) == 1
     assert len(translations[1].to_words) == 2
-    assert len(translations[1].expressions) == 1
+    assert len(translations[1].from_expressions) == 1
+    assert len(translations[1].to_expressions) == 1
     assert len(translations[2].to_words) == 1
-    assert len(translations[2].expressions) == 1
+    assert len(translations[2].from_expressions) == 1
+    assert len(translations[2].to_expressions) == 1
 
 
 def test_tarada():
@@ -61,19 +67,25 @@ def test_tarada():
     assert len(translations) == 6
     assert translations[0].from_word.text == "tarado"
     assert len(translations[0].to_words) == 1
-    assert len(translations[0].expressions) == 1
+    assert len(translations[0].from_expressions) == 1
+    assert len(translations[0].to_expressions) == 1
     assert len(translations[1].to_words) == 3
-    assert len(translations[1].expressions) == 1
+    assert len(translations[1].from_expressions) == 1
+    assert len(translations[1].to_expressions) == 1
     assert len(translations[2].to_words) == 4
-    assert len(translations[2].expressions) == 1
+    assert len(translations[2].from_expressions) == 1
+    assert len(translations[2].to_expressions) == 1
     assert len(translations[3].to_words) == 2
-    assert len(translations[3].expressions) == 1
-    assert translations[3].expressions[0].to_expression == "Only a jerk (or:  moron) goes out without an umbrella when it's raining."
+    assert len(translations[3].from_expressions) == 1
+    assert len(translations[3].to_expressions) == 1
+    assert translations[3].to_expressions[0] == "Only a jerk (or:  moron) goes out without an umbrella when it's raining."
     assert len(translations[4].to_words) == 2
-    assert len(translations[4].expressions) == 1
+    assert len(translations[4].from_expressions) == 1
+    assert len(translations[4].to_expressions) == 1
     assert translations[5].from_word.text == "tarar"
     assert len(translations[5].to_words) == 1
-    assert len(translations[5].expressions) == 1
+    assert len(translations[5].from_expressions) == 1
+    assert len(translations[5].to_expressions) == 1
 
 
 def test_cool():
@@ -93,12 +105,17 @@ def test_cool():
         print(translation)
     assert len(translations) == 5
     assert len(translations[0].to_words) == 2
-    assert len(translations[0].expressions) == 0  # really 2
+    assert len(translations[0].from_expressions) == 2
+    assert len(translations[0].to_expressions) == 2
     assert len(translations[1].to_words) == 2
-    assert len(translations[1].expressions) == 0  # really 1 from, 2 to
+    assert len(translations[1].from_expressions) == 1
+    assert len(translations[1].to_expressions) == 2
     assert len(translations[2].to_words) == 2
-    assert len(translations[2].expressions) == 1
+    assert len(translations[2].from_expressions) == 1
+    assert len(translations[2].to_expressions) == 1
     assert len(translations[3].to_words) == 4
-    assert len(translations[3].expressions) == 1
+    assert len(translations[3].from_expressions) == 1
+    assert len(translations[3].to_expressions) == 1
     assert len(translations[4].to_words) == 1
-    assert len(translations[4].expressions) == 0
+    assert len(translations[4].from_expressions) == 0
+    assert len(translations[4].to_expressions) == 0
