@@ -167,7 +167,7 @@ def make_translation_from_trs(trs: list[Selector], idx: int) -> Translation:
                 if from_expr := tds[1].css("span::text").get():
                     from_expressions.append(from_expr)
             if tds[1].css(".ToEx"):
-                if to_expr := tds[1].css("td::text").get():
+                if to_expr := "".join(tds[1].css("::text").getall()).strip():
                     to_expressions.append(to_expr)
             # if tds[1]
             # phrase translation
