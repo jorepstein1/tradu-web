@@ -170,7 +170,7 @@ export const SettingsModalDialog = ({
                   type="button"
                   disabled={!mochiApiKey.trim()}
                   size="sm"
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                  variant="outline"
                 >
                   Connect
                 </Button>
@@ -267,7 +267,7 @@ export const SettingsModalDialog = ({
                           disabled={creatingTemplate}
                           size="sm"
                           variant="outline"
-                          className="w-full border-border text-card-foreground hover:bg-sidebar-accent"
+                          className="w-full"
                         >
                           {creatingTemplate ? (
                             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -291,7 +291,7 @@ export const SettingsModalDialog = ({
           <Button variant="outline" onClick={onClose}>
             Close
           </Button>
-          <Button type="submit" form="mochi-settings-form" variant="outline">
+          <Button type="submit" form="mochi-settings-form">
             Save Settings
           </Button>
         </DialogFooter>

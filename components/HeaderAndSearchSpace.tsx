@@ -31,9 +31,8 @@ export const SearchSection: React.FC<SearchSectionProps> = ({
             <h1 className="text-card-foreground text-5xl">Tradu</h1>
           </div>
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
-            className="border-border text-card-foreground hover:bg-sidebar-accent"
             onClick={openSettings}
           >
             <Settings className="w-4 h-4 mr-2" />
@@ -56,6 +55,7 @@ export const SearchSection: React.FC<SearchSectionProps> = ({
             <Button
               type="button"
               variant="outline"
+              size="default"
               onClick={() => {
                 if (translationDirection == "esen") {
                   console.log("Setting to enes");
@@ -73,7 +73,6 @@ export const SearchSection: React.FC<SearchSectionProps> = ({
             <Button
               type="submit"
               disabled={loading || !searchTerm.trim()}
-              className="bg-green-600 hover:bg-green-700 text-white disabled:bg-muted disabled:text-muted-foreground"
               formAction={searchAction}
             >
               {loading ? "Searching..." : "Search"}

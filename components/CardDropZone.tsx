@@ -28,7 +28,6 @@ export const CardDropZone = ({
           <Button
             disabled={uploadIsDisabled}
             onClick={uploadCards}
-            className="bg-green-600 hover:bg-green-700 text-white disabled:bg-muted disabled:text-muted-foreground"
           >
             Upload
           </Button>
