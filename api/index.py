@@ -13,6 +13,13 @@ import requests
 logging.basicConfig(filename="record.log", level=logging.DEBUG)
 app = Flask(__name__)
 MOCHI_BASE_URL = "https://app.mochi.cards/api"
+TRADU_TEMPLATE_NAME = "Tradu"
+TRADU_TEMPLATE_CONTENT = "<< Front >>\n---\n<< Back >>"
+TRADU_TEMPLATE_FIELDS = {
+    "tradu-front": {"id": "tradu-front", "name": "Front"},
+    "tradu-back": {"id": "tradu-back", "name": "Back"},
+}
+TRADU_REQUIRED_FIELD_IDS = {"tradu-front", "tradu-back"}
 
 
 @app.route("/api/translate")
@@ -52,32 +59,33 @@ def get_decks():
     return {"decks": decks}
 
 
-@app.route("/api/get-templates")
-def get_templates():
-    print("Getting Mochi templates")
-    mochi_api_key = request.args.get("mochiApiKey")
-    if mochi_api_key is None:
-        return "Must provide Mochi API Key", 400
 
+def find_or_create_tradu_template(mochi_api_key: str) -> tuple[str | None, int]:
     response, code = mochi_get(f"{MOCHI_BASE_URL}/templates", mochi_api_key)
-    if code == 400:
-        print("returning", response, code)
-        return response, code
-
-    templates = []
+    if code != 200:
+        return None, code
     for template_data in response.get("docs", []):
-        templates.append(
-            {
-                "id": template_data["id"],
-                "name": template_data["name"],
-                "fields": [
-                    {"name": field_dict["name"], "id": field_dict["id"]}
-                    for field_dict in template_data["fields"].values()
-                ],
-            }
-        )
-    print(templates)
-    return {"templates": templates}
+        if template_data.get("name") == TRADU_TEMPLATE_NAME:
+            existing_field_ids = set(template_data.get("fields", {}).keys())
+            if TRADU_REQUIRED_FIELD_IDS <= existing_field_ids:
+                print(f"Found existing Tradu template: {template_data['id']}")
+                return template_data["id"], 200
+    create_body = {
+        "name": TRADU_TEMPLATE_NAME,
+        "content": TRADU_TEMPLATE_CONTENT,
+        "fields": TRADU_TEMPLATE_FIELDS,
+    }
+    print("CREATE BODY")
+    print(create_body)
+    response, code = mochi_post(
+        f"{MOCHI_BASE_URL}/templates/", mochi_api_key, data=create_body
+    )
+    if code != 200:
+        print("FAILED")
+        print(response, code)
+        return None, code
+    print(f"Created Tradu template: {response['id']}")
+    return response["id"], 200
 
 
 @app.route("/api/upload", methods=["POST"])
@@ -88,10 +96,12 @@ def upload():
     if mochi_api_key is None:
         return "Must provide Mochi API Key", 400
 
-    print(data)
-    deck_id = "CjkJfr88"
-    template_id = "y0aI44dC"
-    template_id = "3ouJZnZR"
+    deck_id = data.get("deckId")
+    if not deck_id:
+        return "Must provide deckId", 400
+    template_id, code = find_or_create_tradu_template(mochi_api_key)
+    if code != 200:
+        return {"errors": "Failed to find or create Tradu template"}, 400
 
     for translation_dict in data.get("translations"):
         from_word = FromWord(**translation_dict["from_word"])
@@ -131,14 +141,14 @@ def make_fields(translation: Translation):
     :return: a dictionary with the mochi fields
     """
     return {
-        "name": {
-            "id": "name",
+        "tradu-front": {
+            "id": "tradu-front",
             "value": make_card_url_front(
                 translation.from_word, translation.from_expressions
             ),
         },
-        "V72yjxYh": {  # from_definition
-            "id": "V72yjxYh",
+        "tradu-back": {
+            "id": "tradu-back",
             "value": make_card_url_back(
                 translation.to_words, translation.to_expressions
             ),

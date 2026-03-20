@@ -28,8 +28,6 @@ const useCookie = (
 export const Tradu = () => {
   const [savedMochiApiKey, setSavedMochiApiKey] = useState("");
   const [savedMochiDeckId, setSavedMochiDeckId] = useCookie("mochi-deck-id");
-  const [savedMochiTemplateId, setSavedMochiTemplateId] =
-    useCookie("mochi-template-id");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [selectedTranslationIds, setSelectedTranslationIds] = useState<
     Set<UniqueIdentifier>
@@ -60,11 +58,9 @@ export const Tradu = () => {
   const onSaveSettings = (
     newMochiApiKey: string,
     newMochiDeckId: string,
-    newMochiTemplateId: string
   ) => {
     setSavedMochiApiKey(newMochiApiKey);
     setSavedMochiDeckId(newMochiDeckId);
-    setSavedMochiTemplateId(newMochiTemplateId);
     setSettingsOpen(false);
   };
   return (
@@ -91,6 +87,7 @@ export const Tradu = () => {
           uploadSelectedTranslations={(selectedTranslationsToUpload) =>
             uploadSelectedTranslations(
               savedMochiApiKey,
+              savedMochiDeckId,
               selectedTranslationsToUpload
             ).then(() => {
               // Reset modified translations back to originals for uploaded cards
@@ -118,7 +115,6 @@ export const Tradu = () => {
         }}
         savedMochiApiKey={savedMochiApiKey}
         savedMochiDeckId={savedMochiDeckId}
-        savedMochiTemplateId={savedMochiTemplateId}
         onSaveSettings={onSaveSettings}
       />
     </div>

@@ -40,8 +40,9 @@ Python dependencies are managed with `uv`. Flask runs on port 5328; Next.js prox
 
 **Backend** (`/api/index.py`, `/word_reference_scraper`):
 
-- Flask app with four endpoints: `/api/translate`, `/api/get-decks`, `/api/get-templates`, `/api/upload`
+- Flask app with three endpoints: `/api/translate`, `/api/get-decks`, `/api/upload`
 - Translation data is scraped by the local `word_reference_scraper` Python package
+- On upload, the backend automatically finds or creates a Mochi template named "Tradu" (field IDs: `tradu-front`, `tradu-back`; display names: "Front", "Back")
 
 **Data flow:**
 
@@ -69,10 +70,10 @@ Tradu
 ├── ResultsSpace — DndContext wrapping both columns
 │   ├── CardDropZone (id="from") — search results, draggable
 │   └── CardDropZone (id="to") — cards to make, editable/deletable
-└── SettingsModalDialog — Mochi API key, deck/template selectors
+└── SettingsModalDialog — Mochi API key and deck selector
 ```
 
-**State:** Local React state + `useActionState` for search. Mochi settings (Deck ID and Template ID) persisted in cookies.
+**State:** Local React state + `useActionState` for search. Mochi settings (API key in state, Deck ID in cookie) persisted across sessions.
 
 **Styling:** Tailwind v4 with OKLch CSS custom properties for theming (light/dark). shadcn/ui "new-york" style.
 

@@ -1,9 +1,7 @@
 const TRANSLATE_URL = "/api/translate";
 const LOAD_DECKS_URL = "/api/get-decks";
-const LOAD_TEMPLATES_URL = "/api/get-templates";
 const UPLOAD_URL = "/api/upload";
 
-export const REQUIRED_TEMPLATE_FIELDS = ["Name", "Front", "Back"];
 interface FromWord {
   text: string;
   definition: string;
@@ -15,10 +13,6 @@ interface ToWord {
   part_of_speech: string;
   sense: string;
 }
-interface Field {
-  name: string;
-  id: string;
-}
 export interface Translation {
   from_word: FromWord;
   to_words: ToWord[];
@@ -29,12 +23,6 @@ export interface Translation {
 export interface MochiDeck {
   id: string;
   name: string;
-}
-
-export interface MochiTemplate {
-  id: string;
-  name: string;
-  fields: Field[];
 }
 
 export const getTranslations = async (
@@ -51,11 +39,13 @@ export const getTranslations = async (
 
 export const uploadSelectedTranslations = async (
   mochiApiKey: string,
+  deckId: string,
   selectedTranslations: Translation[]
 ) => {
   const body = JSON.stringify({
     translations: selectedTranslations,
-    mochiApiKey: mochiApiKey,
+    mochiApiKey,
+    deckId,
   });
   const response = fetch(UPLOAD_URL, {
     method: "POST",
@@ -83,30 +73,4 @@ export const getMochiDecks = async (
       return response.json();
     })
     .then((json) => json.decks);
-};
-
-export const getMochiTemplates = async (
-  mochiApiKey: string,
-  delayMs: number
-): Promise<MochiTemplate[]> => {
-  const body = new URLSearchParams({ mochiApiKey });
-  console.log("Body:", body.toString());
-  const url = `${LOAD_TEMPLATES_URL}?${body.toString()}`;
-  return new Promise((resolve) => setTimeout(resolve, delayMs))
-    .then(() => fetch(url))
-    .then((response) => {
-      if (!response.ok) {
-        return response.json().then((json) => {
-          throw new Error(json["errors"]);
-        });
-      }
-      return response.json() as Promise<{ templates: MochiTemplate[] }>;
-    })
-    .then((json) =>
-      json.templates.filter((template) => {
-        return REQUIRED_TEMPLATE_FIELDS.every((field) =>
-          template.fields.map((field) => field.name).includes(field)
-        );
-      })
-    );
 };
