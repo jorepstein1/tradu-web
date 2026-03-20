@@ -91,16 +91,17 @@ def find_or_create_tradu_template(mochi_api_key: str) -> tuple[str | None, int]:
 @app.route("/api/upload", methods=["POST"])
 def upload():
     data = request.get_json()
-
     mochi_api_key = data.get("mochiApiKey")
     if mochi_api_key is None:
         return "Must provide Mochi API Key", 400
+    print("uploading with key", mochi_api_key)
 
     deck_id = data.get("deckId")
     if not deck_id:
         return "Must provide deckId", 400
     template_id, code = find_or_create_tradu_template(mochi_api_key)
     if code != 200:
+        print(template_id, code)
         return {"errors": "Failed to find or create Tradu template"}, 400
 
     for translation_dict in data.get("translations"):

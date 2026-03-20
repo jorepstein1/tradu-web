@@ -21,6 +21,7 @@ export const ResultsSpace = ({
   setSelectedTranslationIds,
   uploadSelectedTranslations,
   openSettings,
+  configIsComplete,
 }: {
   searchTerm: string;
   translations: Translation[];
@@ -30,6 +31,7 @@ export const ResultsSpace = ({
   setSelectedTranslationIds: (value: Set<UniqueIdentifier>) => void;
   uploadSelectedTranslations: (translations: Translation[]) => void;
   openSettings: () => void;
+  configIsComplete: boolean;
 }) => {
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
 
@@ -133,8 +135,9 @@ export const ResultsSpace = ({
               ),
             )
           }
-          uploadIsDisabled={selectedTranslationIds.size === 0}
+          uploadIsDisabled={selectedTranslationIds.size === 0 || !configIsComplete}
           openSettings={openSettings}
+          showConfigureWarning={!configIsComplete && selectedTranslationIds.size > 0}
         >
           {selectedTranslationIds.size ? (
             <ul>

@@ -82,6 +82,7 @@ export const Tradu = () => {
           selectedTranslationIds={selectedTranslationIds}
           setSelectedTranslationIds={setSelectedTranslationIds}
           openSettings={() => setSettingsOpen(true)}
+          configIsComplete={!!savedMochiDeckId && !!savedMochiApiKey}
           uploadSelectedTranslations={(selectedTranslationsToUpload) =>
             uploadSelectedTranslations(
               savedMochiApiKey,
