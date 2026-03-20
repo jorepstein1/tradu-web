@@ -20,6 +20,7 @@ export const ResultsSpace = ({
   selectedTranslationIds,
   setSelectedTranslationIds,
   uploadSelectedTranslations,
+  openSettings,
 }: {
   searchTerm: string;
   translations: Translation[];
@@ -28,6 +29,7 @@ export const ResultsSpace = ({
   selectedTranslationIds: Set<UniqueIdentifier>;
   setSelectedTranslationIds: (value: Set<UniqueIdentifier>) => void;
   uploadSelectedTranslations: (translations: Translation[]) => void;
+  openSettings: () => void;
 }) => {
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
 
@@ -132,6 +134,7 @@ export const ResultsSpace = ({
             )
           }
           uploadIsDisabled={selectedTranslationIds.size === 0}
+          openSettings={openSettings}
         >
           {selectedTranslationIds.size ? (
             <ul>

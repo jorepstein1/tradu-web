@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
-import { ArrowLeftRight, Settings } from "lucide-react";
+import { ArrowLeftRight } from "lucide-react";
 import Image from "next/image";
 
 interface SearchSectionProps {
@@ -10,7 +10,6 @@ interface SearchSectionProps {
   loading: boolean;
   translationDirection: string;
   setTranslationDirection: (value: string) => void;
-  openSettings: () => void;
 }
 
 export const SearchSection: React.FC<SearchSectionProps> = ({
@@ -18,7 +17,6 @@ export const SearchSection: React.FC<SearchSectionProps> = ({
   loading,
   translationDirection,
   setTranslationDirection,
-  openSettings,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -30,14 +28,6 @@ export const SearchSection: React.FC<SearchSectionProps> = ({
             <Image src="/tradu_icon.svg" alt="Logo" width={50} height={50} />
             <h1 className="text-card-foreground text-5xl">Tradu</h1>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={openSettings}
-          >
-            <Settings className="w-4 h-4 mr-2" />
-            Settings
-          </Button>
         </div>
 
         <form className="space-y-4">

@@ -71,9 +71,6 @@ export const Tradu = () => {
           loading={searchIsPending}
           translationDirection={translationDirection}
           setTranslationDirection={setTranslationDirection}
-          openSettings={() => {
-            setSettingsOpen(true);
-          }}
         />
       </div>
       <div>
@@ -84,6 +81,7 @@ export const Tradu = () => {
           setModifiedTranslations={setModifiedTranslations}
           selectedTranslationIds={selectedTranslationIds}
           setSelectedTranslationIds={setSelectedTranslationIds}
+          openSettings={() => setSettingsOpen(true)}
           uploadSelectedTranslations={(selectedTranslationsToUpload) =>
             uploadSelectedTranslations(
               savedMochiApiKey,
