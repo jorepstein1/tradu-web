@@ -10,7 +10,12 @@ from dataclasses import asdict
 import logging
 import requests
 
-logging.basicConfig(filename="record.log", level=logging.DEBUG)
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s %(levelname)s %(message)s",
+    handlers=[logging.StreamHandler()],
+)
+log = logging.getLogger(__name__)
 app = Flask(__name__)
 MOCHI_BASE_URL = "https://app.mochi.cards/api"
 TRADU_TEMPLATE_NAME = "Tradu"
@@ -28,25 +33,29 @@ def translate():
     word = request.args.get("word")
     if direction is None or word is None:
         return "Must provide direction and word", 400
-    print(f"Translating word: {word}")
-    wr_content = translate_word(word, direction).decode()
-    translation_strings = [
-        asdict(translation) for translation in make_translations(wr_content)
-    ]
-    print()
+    log.info(f"Translating word: {word} ({direction})")
+    try:
+        wr_content = translate_word(word, direction).decode()
+        translation_strings = [
+            asdict(translation) for translation in make_translations(wr_content)
+        ]
+    except Exception as e:
+        log.error(f"Failed to translate '{word}': {e}")
+        return {"error": "Translation failed"}, 500
+    log.info(f"Got {len(translation_strings)} translation(s) for '{word}'")
     return {"translations": translation_strings}
 
 
 @app.route("/api/get-decks")
 def get_decks():
-    print("Getting decks from Mochi")
+    log.info("Getting decks from Mochi")
     mochi_api_key = request.args.get("mochiApiKey")
     if mochi_api_key is None:
         return "Must provide Mochi API Key", 400
 
     response, code = mochi_get(f"{MOCHI_BASE_URL}/decks", mochi_api_key)
-    if code == 400:
-        print("returning", response, code)
+    if code != 200:
+        log.error(f"Failed to get decks: {response} (status {code})")
         return response, code
 
     decks = []
@@ -56,6 +65,7 @@ def get_decks():
             "name": deck_data["name"],
         }
         decks.append(deck)
+    log.info(f"Returning {len(decks)} deck(s)")
     return {"decks": decks}
 
 
@@ -68,23 +78,21 @@ def find_or_create_tradu_template(mochi_api_key: str) -> tuple[str | None, int]:
         if template_data.get("name") == TRADU_TEMPLATE_NAME:
             existing_field_ids = set(template_data.get("fields", {}).keys())
             if TRADU_REQUIRED_FIELD_IDS <= existing_field_ids:
-                print(f"Found existing Tradu template: {template_data['id']}")
+                log.info(f"Found existing Tradu template: {template_data['id']}")
                 return template_data["id"], 200
+    log.info("Tradu template not found, creating it")
     create_body = {
         "name": TRADU_TEMPLATE_NAME,
         "content": TRADU_TEMPLATE_CONTENT,
         "fields": TRADU_TEMPLATE_FIELDS,
     }
-    print("CREATE BODY")
-    print(create_body)
     response, code = mochi_post(
         f"{MOCHI_BASE_URL}/templates/", mochi_api_key, data=create_body
     )
     if code != 200:
-        print("FAILED")
-        print(response, code)
+        log.error(f"Failed to create Tradu template: {response} (status {code})")
         return None, code
-    print(f"Created Tradu template: {response['id']}")
+    log.info(f"Created Tradu template: {response['id']}")
     return response["id"], 200
 
 
@@ -94,17 +102,20 @@ def upload():
     mochi_api_key = data.get("mochiApiKey")
     if mochi_api_key is None:
         return "Must provide Mochi API Key", 400
-    print("uploading with key", mochi_api_key)
 
     deck_id = data.get("deckId")
     if not deck_id:
         return "Must provide deckId", 400
+
+    translations = data.get("translations", [])
+    log.info(f"Uploading {len(translations)} card(s) to deck {deck_id}")
+
     template_id, code = find_or_create_tradu_template(mochi_api_key)
     if code != 200:
-        print(template_id, code)
+        log.error(f"Could not get Tradu template (status {code})")
         return {"errors": "Failed to find or create Tradu template"}, 400
 
-    for translation_dict in data.get("translations"):
+    for translation_dict in translations:
         from_word = FromWord(**translation_dict["from_word"])
         to_words = [
             ToWord(**to_word) for to_word in translation_dict["to_words"]
@@ -123,13 +134,16 @@ def upload():
             "fields": make_fields(translation),
             "review-reverse?": True,
         }
-        print(card_data)
+        log.debug(f"Creating card for '{translation.from_word.text}'")
         response, code = mochi_post(
             f"{MOCHI_BASE_URL}/cards", mochi_api_key, data=card_data
         )
-        if code == 400:
-            print("returning", response, code)
+        if code != 200:
+            log.error(f"Failed to create card for '{translation.from_word.text}': {response} (status {code})")
             return response, code
+        log.info(f"Created card for '{translation.from_word.text}'")
+
+    log.info("Upload complete")
     return {}
 
 
@@ -233,7 +247,7 @@ def make_mochi_request(request_fn) -> tuple[dict, int]:
     try:
         response = request_fn()
     except requests.exceptions.RequestException as e:
-        print(f"Requests Exception: {e}")
+        log.error(f"Request failed: {e}")
         return {"errors": str(e)}, 400
 
     decks_data = response.json()
