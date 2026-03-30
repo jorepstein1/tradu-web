@@ -163,7 +163,7 @@ expression_style = "font-style: italic; font-size: .85rem"
 
 
 def sanitize_markdown(text: str) -> str:
-    return text.replace("- ", "\- ")
+    return text.replace("- ", "\\- ")
 
 
 def make_card_url_front(word: FromWord, from_expressions: list[str]) -> str:
