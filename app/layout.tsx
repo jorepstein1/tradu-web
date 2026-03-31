@@ -62,6 +62,37 @@ export const metadata: Metadata = {
   },
 };
 
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    url: "https://www.traducards.app",
+    name: "Tradu",
+    description:
+      "Look up Spanish–English translations and instantly turn them into Mochi spaced-repetition flashcards.",
+    creator: {
+      "@type": "Person",
+      name: "Jordan C. K. Epstein",
+      sameAs: "https://jordanepstein.me",
+    },
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    name: "Tradu",
+    url: "https://www.traducards.app",
+    applicationCategory: "EducationApplication",
+    operatingSystem: "All",
+    description:
+      "Look up Spanish–English translations and instantly turn them into Mochi spaced-repetition flashcards.",
+    creator: {
+      "@type": "Person",
+      name: "Jordan C. K. Epstein",
+      sameAs: "https://jordanepstein.me",
+    },
+  },
+];
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -72,6 +103,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         {children}
       </body>
     </html>
