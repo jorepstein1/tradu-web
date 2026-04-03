@@ -8,6 +8,7 @@ import Cookies from "js-cookie";
 import { SettingsModalDialog } from "./SettingsModalDialog";
 import {
   Translation,
+  RateLimitError,
   getTranslations,
   uploadSelectedTranslations,
 } from "@/services/mochiApi";
@@ -45,10 +46,13 @@ export const Tradu = () => {
         return [];
       } else {
         setSearchTerm(term);
-        const translationResults = await getTranslations(
-          translationDirection,
-          term,
-        );
+        let translationResults: Translation[];
+        try {
+          translationResults = await getTranslations(translationDirection, term);
+        } catch (err) {
+          if (err instanceof RateLimitError) toast.warning("Too fast! Slow down!");
+          return _previousState;
+        }
         setSelectedTranslationIds(new Set());
         setModifiedTranslations(translationResults);
         return translationResults;
@@ -107,6 +111,10 @@ export const Tradu = () => {
                 );
               })
               .catch((err: unknown) => {
+                if (err instanceof RateLimitError) {
+                  toast.warning("Too fast! Slow down!");
+                  return;
+                }
                 toast.error("Upload failed", {
                   description: err instanceof Error ? err.message : undefined,
                 });

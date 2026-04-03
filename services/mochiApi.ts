@@ -1,3 +1,14 @@
+export class RateLimitError extends Error {
+  constructor() {
+    super("rate_limited");
+  }
+}
+
+const checkRateLimit = (response: Response): Response => {
+  if (response.status === 429) throw new RateLimitError();
+  return response;
+};
+
 const TRANSLATE_URL = "/api/translate";
 const LOAD_DECKS_URL = "/api/get-decks";
 const UPLOAD_URL = "/api/upload";
@@ -33,6 +44,7 @@ export const getTranslations = async (
   console.log("Body:", body.toString());
   const url = `${TRANSLATE_URL}?${body.toString()}`;
   return fetch(url)
+    .then(checkRateLimit)
     .then((response) => response.json())
     .then((json) => json.translations);
 };
@@ -53,7 +65,9 @@ export const uploadSelectedTranslations = async (
       Authorization: mochiApiKey,
     },
     body: body,
-  }).then((response) => response.json());
+  })
+    .then(checkRateLimit)
+    .then((response) => response.json());
   return response;
 };
 
@@ -63,6 +77,7 @@ export const getMochiDecks = async (
   return fetch(LOAD_DECKS_URL, {
     headers: { Authorization: mochiApiKey },
   })
+    .then(checkRateLimit)
     .then((response) => {
       if (!response.ok) {
         return response.json().then((json) => {

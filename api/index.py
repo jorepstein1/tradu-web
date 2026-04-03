@@ -1,4 +1,6 @@
 from flask import Flask, request
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from word_reference_scraper.word_reference import (
     FromWord,
     ToWord,
@@ -17,6 +19,11 @@ logging.basicConfig(
 )
 log = logging.getLogger(__name__)
 app = Flask(__name__)
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    storage_uri="memory://",
+)
 MOCHI_BASE_URL = "https://app.mochi.cards/api"
 TRADU_TEMPLATE_NAME = "Tradu"
 TRADU_TEMPLATE_CONTENT = "<< Front >>\n---\n<< Back >>"
@@ -28,6 +35,7 @@ TRADU_REQUIRED_FIELD_IDS = {"tradu-front", "tradu-back"}
 
 
 @app.route("/api/translate")
+@limiter.limit("1/second")
 def translate():
     direction = request.args.get("direction")
     word = request.args.get("word")
@@ -47,6 +55,7 @@ def translate():
 
 
 @app.route("/api/get-decks")
+@limiter.limit("1/second")
 def get_decks():
     log.info("Getting decks from Mochi")
     mochi_api_key = request.headers.get("Authorization")
@@ -97,6 +106,7 @@ def find_or_create_tradu_template(mochi_api_key: str) -> tuple[str | None, int]:
 
 
 @app.route("/api/upload", methods=["POST"])
+@limiter.limit("1/second")
 def upload():
     mochi_api_key = request.headers.get("Authorization")
     if mochi_api_key is None:
