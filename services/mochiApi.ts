@@ -44,13 +44,13 @@ export const uploadSelectedTranslations = async (
 ) => {
   const body = JSON.stringify({
     translations: selectedTranslations,
-    mochiApiKey,
     deckId,
   });
   const response = fetch(UPLOAD_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json; charset=utf-8",
+      Authorization: mochiApiKey,
     },
     body: body,
   }).then((response) => response.json());
@@ -60,10 +60,9 @@ export const uploadSelectedTranslations = async (
 export const getMochiDecks = async (
   mochiApiKey: string
 ): Promise<MochiDeck[]> => {
-  const body = new URLSearchParams({ mochiApiKey });
-  console.log("Body:", body.toString());
-  const url = `${LOAD_DECKS_URL}?${body.toString()}`;
-  return fetch(url)
+  return fetch(LOAD_DECKS_URL, {
+    headers: { Authorization: mochiApiKey },
+  })
     .then((response) => {
       if (!response.ok) {
         return response.json().then((json) => {

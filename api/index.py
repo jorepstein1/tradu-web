@@ -49,7 +49,7 @@ def translate():
 @app.route("/api/get-decks")
 def get_decks():
     log.info("Getting decks from Mochi")
-    mochi_api_key = request.args.get("mochiApiKey")
+    mochi_api_key = request.headers.get("Authorization")
     if mochi_api_key is None:
         return "Must provide Mochi API Key", 400
 
@@ -98,10 +98,10 @@ def find_or_create_tradu_template(mochi_api_key: str) -> tuple[str | None, int]:
 
 @app.route("/api/upload", methods=["POST"])
 def upload():
-    data = request.get_json()
-    mochi_api_key = data.get("mochiApiKey")
+    mochi_api_key = request.headers.get("Authorization")
     if mochi_api_key is None:
         return "Must provide Mochi API Key", 400
+    data = request.get_json()
 
     deck_id = data.get("deckId")
     if not deck_id:
