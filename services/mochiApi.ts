@@ -41,7 +41,6 @@ export const getTranslations = async (
   word: string
 ): Promise<Translation[]> => {
   const body = new URLSearchParams({ direction, word });
-  console.log("Body:", body.toString());
   const url = `${TRANSLATE_URL}?${body.toString()}`;
   return fetch(url)
     .then(checkRateLimit)

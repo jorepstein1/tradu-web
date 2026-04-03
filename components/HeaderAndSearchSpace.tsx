@@ -48,10 +48,8 @@ export const SearchSection: React.FC<SearchSectionProps> = ({
               size="default"
               onClick={() => {
                 if (translationDirection == "esen") {
-                  console.log("Setting to enes");
                   setTranslationDirection("enes");
                 } else {
-                  console.log("Setting to esen");
                   setTranslationDirection("esen");
                 }
               }}
