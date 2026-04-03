@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "./ui/alert";
 import { Label } from "./ui/label";
-import { Key } from "lucide-react";
+import { Key, Loader2 } from "lucide-react";
 import { Input } from "./ui/input";
 import {
   Select,
@@ -43,12 +43,14 @@ export const SettingsModalDialog = ({
   const [mochiApiKey, setMochiApiKey] = useState(savedMochiApiKey);
   const [mochiDeckId, setMochiDeckId] = useState(savedMochiDeckId);
   const [curError, setCurError] = useState("");
+  const [isLoadingDecks, setIsLoadingDecks] = useState(false);
   const [decks, setDecks] = useState<MochiDeck[]>([]);
   useEffect(() => {
     loadMochiData();
   }, [savedMochiApiKey, isOpen]);
   const loadMochiData = async () => {
     if (mochiApiKey) {
+      setIsLoadingDecks(true);
       let err = "";
       const fetchedMochiDecks = await getMochiDecks(mochiApiKey).catch(
         (error) => {
@@ -56,6 +58,7 @@ export const SettingsModalDialog = ({
           return [];
         }
       );
+      setIsLoadingDecks(false);
 
       if (err) {
         setCurError(err);
@@ -117,11 +120,18 @@ export const SettingsModalDialog = ({
                 <Button
                   onClick={loadMochiData}
                   type="button"
-                  disabled={!mochiApiKey.trim()}
+                  disabled={!mochiApiKey.trim() || isLoadingDecks}
                   size="sm"
                   variant="outline"
                 >
-                  Connect
+                  {isLoadingDecks ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Connecting...
+                    </>
+                  ) : (
+                    "Connect"
+                  )}
                 </Button>
               </div>
               {curError && (

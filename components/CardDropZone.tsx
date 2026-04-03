@@ -4,13 +4,14 @@ import { Card, CardContent, CardHeader } from "./ui/card";
 import { Button } from "./ui/button";
 import { ScrollArea } from "./ui/scroll-area";
 import { useDroppable } from "@dnd-kit/core";
-import { Settings, TriangleAlert } from "lucide-react";
+import { Loader2, Settings, TriangleAlert } from "lucide-react";
 export const CardDropZone = ({
   id,
   children,
   header,
   uploadCards,
   uploadIsDisabled,
+  uploadIsPending,
   openSettings,
   showConfigureWarning,
 }: {
@@ -19,6 +20,7 @@ export const CardDropZone = ({
   children: React.ReactNode;
   uploadCards?: () => void;
   uploadIsDisabled?: boolean;
+  uploadIsPending?: boolean;
   openSettings?: () => void;
   showConfigureWarning?: boolean;
 }) => {
@@ -40,7 +42,14 @@ export const CardDropZone = ({
               Configure
             </Button>
             <Button disabled={uploadIsDisabled} onClick={uploadCards}>
-              Upload
+              {uploadIsPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Uploading...
+                </>
+              ) : (
+                "Upload"
+              )}
             </Button>
           </div>
         ) : null}

@@ -19,7 +19,8 @@ export const ResultsSpace = ({
   setModifiedTranslations,
   selectedTranslationIds,
   setSelectedTranslationIds,
-  uploadSelectedTranslations,
+  uploadAction,
+  uploadIsPending,
   openSettings,
   configIsComplete,
 }: {
@@ -29,7 +30,8 @@ export const ResultsSpace = ({
   setModifiedTranslations: (translations: Translation[]) => void;
   selectedTranslationIds: Set<UniqueIdentifier>;
   setSelectedTranslationIds: (value: Set<UniqueIdentifier>) => void;
-  uploadSelectedTranslations: (translations: Translation[]) => void;
+  uploadAction: (translations: Translation[]) => void;
+  uploadIsPending: boolean;
   openSettings: () => void;
   configIsComplete: boolean;
 }) => {
@@ -129,13 +131,14 @@ export const ResultsSpace = ({
           id="to"
           header="Cards to Make"
           uploadCards={() =>
-            uploadSelectedTranslations(
+            uploadAction(
               modifiedTranslations.filter((translation) =>
                 selectedTranslationIds.has(translation.translation_id),
               ),
             )
           }
-          uploadIsDisabled={selectedTranslationIds.size === 0 || !configIsComplete}
+          uploadIsDisabled={selectedTranslationIds.size === 0 || !configIsComplete || uploadIsPending}
+          uploadIsPending={uploadIsPending}
           openSettings={openSettings}
           showConfigureWarning={!configIsComplete && selectedTranslationIds.size > 0}
         >

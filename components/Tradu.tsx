@@ -39,6 +39,43 @@ export const Tradu = () => {
   >([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [translationDirection, setTranslationDirection] = useState("esen");
+  const [, uploadAction, uploadIsPending] = useActionState(
+    async (_: undefined, selectedTranslationsToUpload: Translation[]) => {
+      try {
+        await uploadSelectedTranslations(
+          savedMochiApiKey,
+          savedMochiDeckId,
+          selectedTranslationsToUpload,
+        );
+        const uploadedIds = new Set(
+          selectedTranslationsToUpload.map((t) => t.translation_id),
+        );
+        setModifiedTranslations(
+          modifiedTranslations.map((t) =>
+            uploadedIds.has(t.translation_id)
+              ? (translationResponse.find(
+                  (orig) => orig.translation_id === t.translation_id,
+                ) ?? t)
+              : t,
+          ),
+        );
+        setSelectedTranslationIds(new Set());
+        toast.success(
+          `${selectedTranslationsToUpload.length} card(s) uploaded successfully`,
+        );
+      } catch (err) {
+        if (err instanceof RateLimitError) {
+          toast.warning("Too fast! Slow down!");
+        } else {
+          toast.error("Upload failed", {
+            description: err instanceof Error ? err.message : undefined,
+          });
+        }
+      }
+      return undefined;
+    },
+    undefined,
+  );
   const [translationResponse, searchAction, searchIsPending] = useActionState(
     async (_previousState: Translation[], formData: FormData) => {
       const term = formData.get("term");
@@ -91,41 +128,8 @@ export const Tradu = () => {
           setSelectedTranslationIds={setSelectedTranslationIds}
           openSettings={() => setSettingsOpen(true)}
           configIsComplete={!!savedMochiDeckId && !!savedMochiApiKey}
-          uploadSelectedTranslations={(selectedTranslationsToUpload) =>
-            uploadSelectedTranslations(
-              savedMochiApiKey,
-              savedMochiDeckId,
-              selectedTranslationsToUpload,
-            )
-              .then(() => {
-                // Reset modified translations back to originals for uploaded cards
-                const uploadedIds = new Set(
-                  selectedTranslationsToUpload.map((t) => t.translation_id),
-                );
-                setModifiedTranslations(
-                  modifiedTranslations.map((t) =>
-                    uploadedIds.has(t.translation_id)
-                      ? (translationResponse.find(
-                          (orig) => orig.translation_id === t.translation_id,
-                        ) ?? t)
-                      : t,
-                  ),
-                );
-                setSelectedTranslationIds(new Set());
-                toast.success(
-                  `${selectedTranslationsToUpload.length} card(s) uploaded successfully`,
-                );
-              })
-              .catch((err: unknown) => {
-                if (err instanceof RateLimitError) {
-                  toast.warning("Too fast! Slow down!");
-                  return;
-                }
-                toast.error("Upload failed", {
-                  description: err instanceof Error ? err.message : undefined,
-                });
-              })
-          }
+          uploadAction={uploadAction}
+          uploadIsPending={uploadIsPending}
         />
       </div>
       <SettingsModalDialog
