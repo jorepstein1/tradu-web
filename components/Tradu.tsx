@@ -50,7 +50,13 @@ export const Tradu = () => {
         try {
           translationResults = await getTranslations(translationDirection, term);
         } catch (err) {
-          if (err instanceof RateLimitError) toast.warning("Too fast! Slow down!");
+          if (err instanceof RateLimitError) {
+            toast.warning("Too fast! Slow down!");
+          } else {
+            toast.error("Search failed", {
+              description: err instanceof Error ? err.message : undefined,
+            });
+          }
           return _previousState;
         }
         setSelectedTranslationIds(new Set());
