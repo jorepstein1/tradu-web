@@ -28,12 +28,12 @@ export const CardDropZone = ({
     id: id,
   });
   return (
-    <Card ref={setNodeRef}>
+    <Card ref={setNodeRef} aria-label={id == "to" ? "Cards to make drop zone" : "Search results drop zone"}>
       <CardHeader className="flex items-center justify-between">
         {header}
         {id == "to" ? (
           <div className="flex items-center gap-2">
-            <Button variant="ghost" onClick={openSettings}>
+            <Button variant="ghost" onClick={openSettings} aria-label={showConfigureWarning ? "Configure settings (action required)" : "Configure settings"}>
               {showConfigureWarning ? (
                 <TriangleAlert className="w-4 h-4" />
               ) : (
@@ -41,7 +41,7 @@ export const CardDropZone = ({
               )}
               Configure
             </Button>
-            <Button disabled={uploadIsDisabled} onClick={uploadCards}>
+            <Button disabled={uploadIsDisabled} onClick={uploadCards} aria-label={uploadIsPending ? "Uploading cards" : "Upload cards to Mochi"}>
               {uploadIsPending ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />

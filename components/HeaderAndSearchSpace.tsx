@@ -46,6 +46,7 @@ export const SearchSection: React.FC<SearchSectionProps> = ({
               type="button"
               variant="outline"
               size="default"
+              aria-label={`Toggle translation direction: currently ${translationDirection == "esen" ? "Spanish to English" : "English to Spanish"}`}
               onClick={() => {
                 if (translationDirection == "esen") {
                   setTranslationDirection("enes");
