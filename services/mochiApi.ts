@@ -9,9 +9,9 @@ const checkRateLimit = (response: Response): Response => {
   return response;
 };
 
-const TRANSLATE_URL = "/api/translate";
-const LOAD_DECKS_URL = "/api/get-decks";
-const UPLOAD_URL = "/api/upload";
+const TRANSLATE_URL = "/api/translation";
+const LOAD_DECKS_URL = "/api/decks";
+const UPLOAD_URL = "/api/cards";
 
 interface FromWord {
   text: string;

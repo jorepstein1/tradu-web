@@ -36,7 +36,7 @@ VALID_DIRECTIONS = {"enes", "esen"}
 MAX_WORD_LENGTH = 50
 
 
-@app.route("/api/translate")
+@app.route("/api/translation")
 @limiter.limit("1/second")
 def translate():
     log.info("Getting decks from Mochi")
@@ -61,7 +61,7 @@ def translate():
     return {"translations": translation_strings}
 
 
-@app.route("/api/get-decks")
+@app.route("/api/decks")
 @limiter.limit("1/second")
 def get_decks():
     log.info(request.url)
@@ -112,7 +112,7 @@ def find_or_create_tradu_template(mochi_api_key: str) -> tuple[str | None, int]:
     return response["id"], 200
 
 
-@app.route("/api/upload", methods=["POST"])
+@app.route("/api/cards", methods=["POST"])
 @limiter.limit("1/second")
 def upload():
     log.info(request.url)
