@@ -9,7 +9,7 @@ A web app for looking up translations and turning them into flashcards. Availabl
 3. **Select** — Drag translations into your card queue; edit or remove fields as needed
 4. **Upload** — Send the cards to your [Mochi Cards](https://mochi.cards) account via API
 
-Configure your Mochi API key, deck, and template in the settings menu.
+Configure your Mochi API key and deck in the settings menu (the Mochi template is created automatically).
 
 ## Tech
 
