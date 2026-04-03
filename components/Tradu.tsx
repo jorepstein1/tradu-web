@@ -1,5 +1,6 @@
 "use client";
 import { useActionState, useState } from "react";
+import { toast } from "sonner";
 import { SearchSection } from "@/components/HeaderAndSearchSpace";
 import { ResultsSpace } from "@/components/ResultsSpace";
 import { UniqueIdentifier } from "@dnd-kit/core";
@@ -12,7 +13,7 @@ import {
 } from "@/services/mochiApi";
 
 const useCookie = (
-  cookieName: string
+  cookieName: string,
 ): [string, (newValue: string) => void] => {
   // Currently setting cookie to an empty string is a no-op
   const [cookieValue, setCookie] = useState(Cookies.get(cookieName) || "");
@@ -46,19 +47,16 @@ export const Tradu = () => {
         setSearchTerm(term);
         const translationResults = await getTranslations(
           translationDirection,
-          term
+          term,
         );
         setSelectedTranslationIds(new Set());
         setModifiedTranslations(translationResults);
         return translationResults;
       }
     },
-    []
+    [],
   ); // The Action to perform the Search
-  const onSaveSettings = (
-    newMochiApiKey: string,
-    newMochiDeckId: string,
-  ) => {
+  const onSaveSettings = (newMochiApiKey: string, newMochiDeckId: string) => {
     setSavedMochiApiKey(newMochiApiKey);
     setSavedMochiDeckId(newMochiDeckId);
     setSettingsOpen(false);
@@ -87,23 +85,32 @@ export const Tradu = () => {
             uploadSelectedTranslations(
               savedMochiApiKey,
               savedMochiDeckId,
-              selectedTranslationsToUpload
-            ).then(() => {
-              // Reset modified translations back to originals for uploaded cards
-              const uploadedIds = new Set(
-                selectedTranslationsToUpload.map((t) => t.translation_id)
-              );
-              setModifiedTranslations(
-                modifiedTranslations.map((t) =>
-                  uploadedIds.has(t.translation_id)
-                    ? (translationResponse.find(
-                        (orig) => orig.translation_id === t.translation_id
-                      ) ?? t)
-                    : t
-                )
-              );
-              setSelectedTranslationIds(new Set());
-            })
+              selectedTranslationsToUpload,
+            )
+              .then(() => {
+                // Reset modified translations back to originals for uploaded cards
+                const uploadedIds = new Set(
+                  selectedTranslationsToUpload.map((t) => t.translation_id),
+                );
+                setModifiedTranslations(
+                  modifiedTranslations.map((t) =>
+                    uploadedIds.has(t.translation_id)
+                      ? (translationResponse.find(
+                          (orig) => orig.translation_id === t.translation_id,
+                        ) ?? t)
+                      : t,
+                  ),
+                );
+                setSelectedTranslationIds(new Set());
+                toast.success(
+                  `${selectedTranslationsToUpload.length} card(s) uploaded successfully`,
+                );
+              })
+              .catch((err: unknown) => {
+                toast.error("Upload failed", {
+                  description: err instanceof Error ? err.message : undefined,
+                });
+              })
           }
         />
       </div>
