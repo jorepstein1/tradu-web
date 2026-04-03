@@ -32,15 +32,22 @@ TRADU_TEMPLATE_FIELDS = {
     "tradu-back": {"id": "tradu-back", "name": "Back"},
 }
 TRADU_REQUIRED_FIELD_IDS = {"tradu-front", "tradu-back"}
+VALID_DIRECTIONS = {"enes", "esen"}
+MAX_WORD_LENGTH = 50
 
 
 @app.route("/api/translate")
 @limiter.limit("1/second")
 def translate():
+    log.info("Getting decks from Mochi")
     direction = request.args.get("direction")
     word = request.args.get("word")
     if direction is None or word is None:
         return "Must provide direction and word", 400
+    if direction not in VALID_DIRECTIONS:
+        return f"direction must be one of: {', '.join(sorted(VALID_DIRECTIONS))}", 400
+    if len(word) > MAX_WORD_LENGTH:
+        return f"word must be {MAX_WORD_LENGTH} characters or fewer", 400
     log.info(f"Translating word: {word} ({direction})")
     try:
         wr_content = translate_word(word, direction).decode()
@@ -57,7 +64,7 @@ def translate():
 @app.route("/api/get-decks")
 @limiter.limit("1/second")
 def get_decks():
-    log.info("Getting decks from Mochi")
+    log.info(request.url)
     mochi_api_key = request.headers.get("Authorization")
     if mochi_api_key is None:
         return "Must provide Mochi API Key", 400
@@ -108,16 +115,21 @@ def find_or_create_tradu_template(mochi_api_key: str) -> tuple[str | None, int]:
 @app.route("/api/upload", methods=["POST"])
 @limiter.limit("1/second")
 def upload():
+    log.info(request.url)
     mochi_api_key = request.headers.get("Authorization")
     if mochi_api_key is None:
         return "Must provide Mochi API Key", 400
-    data = request.get_json()
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return "Request body must be a JSON object", 400
 
     deck_id = data.get("deckId")
-    if not deck_id:
-        return "Must provide deckId", 400
+    if not isinstance(deck_id, str) or not deck_id:
+        return "Must provide deckId as a non-empty string", 400
 
     translations = data.get("translations", [])
+    if not isinstance(translations, list):
+        return "translations must be an array", 400
     log.info(f"Uploading {len(translations)} card(s) to deck {deck_id}")
 
     template_id, code = find_or_create_tradu_template(mochi_api_key)
