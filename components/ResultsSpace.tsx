@@ -107,6 +107,11 @@ export const ResultsSpace = ({
                     translation={translation}
                     key={translation.translation_id}
                     isEditable={false}
+                    onMove={() => {
+                      const copy = new Set(selectedTranslationIds);
+                      copy.add(translation.translation_id);
+                      setSelectedTranslationIds(copy);
+                    }}
                   />
                 ))
             ) : (
@@ -158,6 +163,12 @@ export const ResultsSpace = ({
                     }
                     onReset={() => resetTranslation(translation.translation_id)}
                     hasChanges={hasChanges(translation.translation_id)}
+                    onMove={() => {
+                      const copy = new Set(selectedTranslationIds);
+                      copy.delete(translation.translation_id);
+                      setSelectedTranslationIds(copy);
+                      resetTranslation(translation.translation_id);
+                    }}
                   />
                 ))}
             </ul>

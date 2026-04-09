@@ -79,11 +79,29 @@ Tradu
 
 ## Drag & Drop
 
-dnd-kit requires keyboard navigation for Claude Chrome extension — mouse drag is unreliable:
-
-1. Click card to focus
-2. Press `Space` to pick up
-3. Press `ArrowRight` to move toward target drop zone
-4. Press `Space` to drop
+Only pointer/mouse-based dragging is configured (no `KeyboardSensor`). Mouse drag is not reliably driveable by the Claude Chrome extension.
 
 Dragging a card back to the left zone removes it from selection.
+
+## Keyboard Navigation
+
+Cards support keyboard-driven column movement via `onKeyDown` on the `<li>` in `TranslationCard` (not dnd-kit `KeyboardSensor`):
+
+- **Tab** — focus a card (dnd-kit sets `tabIndex=0` via `useDraggable` attributes)
+- **ArrowRight** — move focused card from "Search Results" → "Cards to Make"
+- **ArrowLeft** — move focused card from "Cards to Make" → "Search Results" (also resets edits)
+
+Focus follows the card after moving via `requestAnimationFrame` + `data-translation-id`.
+
+## Testing in Chrome (for Claude)
+
+To test card navigation end-to-end using the Chrome extension:
+
+1. Start the dev server: `npm run next-dev` (port 3000)
+2. Navigate to `http://localhost:3000`
+3. Press **Tab** to focus the search input, **type** a word, press **Enter** — wait ~4s for results
+4. Press **Tab** three times to focus the first card
+5. Press **ArrowRight** — card should move to "Cards to Make" and stay focused
+6. Press **ArrowLeft** — card should move back to "Search Results" and stay focused
+
+Note: clicking to focus the search input is unreliable from the extension — always use Tab to focus it first.
