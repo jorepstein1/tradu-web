@@ -74,23 +74,47 @@ export const TranslationCard = ({
   onUpdate,
   onReset,
   hasChanges,
+  onMove,
 }: {
   translation: Translation;
   isEditable: boolean;
   onUpdate?: (updater: (t: Translation) => Translation) => void;
   onReset?: () => void;
   hasChanges?: boolean;
+  onMove?: () => void;
 }) => {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: translation.translation_id,
   });
 
+  const refocusAfterMove = () => {
+    requestAnimationFrame(() => {
+      document
+        .querySelector<HTMLElement>(
+          `[data-translation-id="${translation.translation_id}"]`,
+        )
+        ?.focus();
+    });
+  };
+
   return (
     <li
       ref={setNodeRef}
       style={{ listStyle: "None" }}
+      data-translation-id={translation.translation_id}
       {...listeners}
       {...attributes}
+      onKeyDown={(e) => {
+        if (!isEditable && e.key === "ArrowRight") {
+          e.preventDefault();
+          onMove?.();
+          refocusAfterMove();
+        } else if (isEditable && e.key === "ArrowLeft") {
+          e.preventDefault();
+          onMove?.();
+          refocusAfterMove();
+        }
+      }}
     >
       <Card className={`cursor-move ${isDragging ? "opacity-50" : ""}`}>
         <CardContent className="p-4 border-border">
