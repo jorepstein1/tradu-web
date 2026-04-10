@@ -48,4 +48,5 @@ record.log
 word_ref_scraper/build
 *.egg-info
 .vscode
-.claude
+.claude/worktrees
+.claude/settings.local.json
