@@ -2,7 +2,7 @@
 name: Tradu End-to-End Testing
 description: Run end-to-end browser tests on the Tradu webapp
 context: fork
-allowed-tools: npm sleep curl head
+allowed-tools: npm sleep curl head pkill kill echo
 ---
 
 # Tradu E2E Testing Skill
