@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "./ui/alert";
 import { Label } from "./ui/label";
-import { Key, Loader2 } from "lucide-react";
+import { ExternalLink, Key, Loader2 } from "lucide-react";
 import { Input } from "./ui/input";
 import {
   Select,
@@ -105,6 +105,15 @@ export const SettingsModalDialog = ({
               >
                 <Key className="w-4 h-4" />
                 Mochi API Key
+                <a
+                  href="https://mochi.cards/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ml-1 text-muted-foreground hover:text-foreground"
+                  aria-label="Visit mochi.cards"
+                >
+                  <ExternalLink className="w-3 h-3" />
+                </a>
               </Label>
               <div className="flex gap-2">
                 <Input
