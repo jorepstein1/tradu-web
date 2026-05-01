@@ -85,7 +85,10 @@ export const Tradu = () => {
         setSearchTerm(term);
         let translationResults: Translation[];
         try {
-          translationResults = await getTranslations(translationDirection, term);
+          translationResults = await getTranslations(
+            translationDirection,
+            term,
+          );
         } catch (err) {
           if (err instanceof RateLimitError) {
             toast.warning("Too fast! Slow down!");
@@ -109,8 +112,8 @@ export const Tradu = () => {
     setSettingsOpen(false);
   };
   return (
-    <div className="max-w-7xl mx-auto space-y-6 h-screen max-h-screen">
-      <div>
+    <div className="max-w-7xl w-full mx-auto flex flex-col gap-4 flex-1 min-h-0">
+      <div className="shrink-0">
         <SearchSection
           searchAction={searchAction}
           loading={searchIsPending}
@@ -118,7 +121,7 @@ export const Tradu = () => {
           setTranslationDirection={setTranslationDirection}
         />
       </div>
-      <div>
+      <div className="flex-1 min-h-0 overflow-hidden">
         <ResultsSpace
           searchTerm={searchTerm}
           translations={translationResponse}

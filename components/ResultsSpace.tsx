@@ -92,7 +92,7 @@ export const ResultsSpace = ({
   );
   return (
     <DndContext onDragEnd={onDragEnd} onDragStart={onDragStart}>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 md:grid-rows-1 gap-3 h-full">
         <CardDropZone id="from" header="Search Results">
           <ul>
             {translations.length ? (
@@ -142,10 +142,16 @@ export const ResultsSpace = ({
               ),
             )
           }
-          uploadIsDisabled={selectedTranslationIds.size === 0 || !configIsComplete || uploadIsPending}
+          uploadIsDisabled={
+            selectedTranslationIds.size === 0 ||
+            !configIsComplete ||
+            uploadIsPending
+          }
           uploadIsPending={uploadIsPending}
           openSettings={openSettings}
-          showConfigureWarning={!configIsComplete && selectedTranslationIds.size > 0}
+          showConfigureWarning={
+            !configIsComplete && selectedTranslationIds.size > 0
+          }
         >
           {selectedTranslationIds.size ? (
             <ul>

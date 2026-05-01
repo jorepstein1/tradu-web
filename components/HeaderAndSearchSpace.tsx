@@ -22,7 +22,7 @@ export const SearchSection: React.FC<SearchSectionProps> = ({
 
   return (
     <Card className="border-border bg-card">
-      <CardContent className="p-6">
+      <CardContent className="px-6 py-2">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center justify-between gap-3">
             <Image src="/tradu_icon.svg" alt="Logo" width={50} height={50} />

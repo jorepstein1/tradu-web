@@ -28,12 +28,26 @@ export const CardDropZone = ({
     id: id,
   });
   return (
-    <Card ref={setNodeRef} aria-label={id == "to" ? "Cards to make drop zone" : "Search results drop zone"}>
+    <Card
+      ref={setNodeRef}
+      className="h-full gap-4 py-5"
+      aria-label={
+        id == "to" ? "Cards to make drop zone" : "Search results drop zone"
+      }
+    >
       <CardHeader className="flex items-center justify-between">
         {header}
         {id == "to" ? (
           <div className="flex items-center gap-2">
-            <Button variant="ghost" onClick={openSettings} aria-label={showConfigureWarning ? "Configure settings (action required)" : "Configure settings"}>
+            <Button
+              variant="ghost"
+              onClick={openSettings}
+              aria-label={
+                showConfigureWarning
+                  ? "Configure settings (action required)"
+                  : "Configure settings"
+              }
+            >
               {showConfigureWarning ? (
                 <TriangleAlert className="w-4 h-4" />
               ) : (
@@ -41,7 +55,13 @@ export const CardDropZone = ({
               )}
               Configure
             </Button>
-            <Button disabled={uploadIsDisabled} onClick={uploadCards} aria-label={uploadIsPending ? "Uploading cards" : "Upload cards to Mochi"}>
+            <Button
+              disabled={uploadIsDisabled}
+              onClick={uploadCards}
+              aria-label={
+                uploadIsPending ? "Uploading cards" : "Upload cards to Mochi"
+              }
+            >
               {uploadIsPending ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -54,8 +74,8 @@ export const CardDropZone = ({
           </div>
         ) : null}
       </CardHeader>
-      <CardContent>
-        <ScrollArea type="auto" className="h-[500px]  px-4">
+      <CardContent className="min-h-0">
+        <ScrollArea type="auto" className="h-full px-4">
           <ul>{children}</ul>
         </ScrollArea>
       </CardContent>
