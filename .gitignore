@@ -50,3 +50,5 @@ word_ref_scraper/build
 .vscode
 .claude/worktrees
 .claude/settings.local.json
+.vercel
+.env*
