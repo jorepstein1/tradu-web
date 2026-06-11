@@ -23,6 +23,7 @@ import {
   getMochiDecks,
   MochiDeck,
 } from "@/services/mochiApi";
+import { saveMochiSettings } from "@/services/userApi";
 
 export const SettingsModalDialog = ({
   isOpen,
@@ -45,6 +46,14 @@ export const SettingsModalDialog = ({
   const [curError, setCurError] = useState("");
   const [isLoadingDecks, setIsLoadingDecks] = useState(false);
   const [decks, setDecks] = useState<MochiDeck[]>([]);
+  // Keep local inputs in sync with persisted values, which may arrive
+  // asynchronously after a signed-in user's settings are fetched.
+  useEffect(() => {
+    setMochiApiKey(savedMochiApiKey);
+  }, [savedMochiApiKey]);
+  useEffect(() => {
+    setMochiDeckId(savedMochiDeckId);
+  }, [savedMochiDeckId]);
   useEffect(() => {
     loadMochiData();
   }, [savedMochiApiKey, isOpen]);
@@ -94,6 +103,9 @@ export const SettingsModalDialog = ({
           id="mochi-settings-form"
           onSubmit={(e) => {
             e.preventDefault();
+            // Persist server-side for signed-in users (no-ops for anonymous
+            // users, who get a 401 the helper swallows).
+            saveMochiSettings({ mochiApiKey, mochiDeckId });
             onSaveSettings(mochiApiKey, mochiDeckId);
           }}
         >

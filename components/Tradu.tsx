@@ -1,5 +1,12 @@
 "use client";
-import { useActionState, useState } from "react";
+import {
+  startTransition,
+  useActionState,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
+import { authClient } from "@/lib/auth/client";
 import { toast } from "sonner";
 import { SearchSection } from "@/components/HeaderAndSearchSpace";
 import { ResultsSpace } from "@/components/ResultsSpace";
@@ -12,6 +19,12 @@ import {
   getTranslations,
   uploadSelectedTranslations,
 } from "@/services/mochiApi";
+import {
+  getMochiSettings,
+  getSearchHistory,
+  recordSearch,
+  SearchHistoryEntry,
+} from "@/services/userApi";
 
 const useCookie = (
   cookieName: string,
@@ -28,6 +41,8 @@ const useCookie = (
 };
 
 export const Tradu = () => {
+  const { data: session } = authClient.useSession();
+  const isSignedIn = !!session?.user;
   const [savedMochiApiKey, setSavedMochiApiKey] = useState("");
   const [savedMochiDeckId, setSavedMochiDeckId] = useCookie("mochi-deck-id");
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -39,6 +54,36 @@ export const Tradu = () => {
   >([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [translationDirection, setTranslationDirection] = useState("esen");
+  const [searchHistory, setSearchHistory] = useState<SearchHistoryEntry[]>([]);
+
+  const refreshHistory = useCallback(() => {
+    if (!isSignedIn) {
+      setSearchHistory([]);
+      return;
+    }
+    getSearchHistory()
+      .then(setSearchHistory)
+      .catch(() => {
+        // Best-effort; leave the existing list in place on failure.
+      });
+  }, [isSignedIn]);
+
+  // When the user signs in, hydrate persisted Mochi credentials and load
+  // their recent search history. Anonymous users keep the cookie/state-only
+  // behaviour.
+  useEffect(() => {
+    if (!isSignedIn) return;
+    getMochiSettings()
+      .then((settings) => {
+        if (!settings) return;
+        if (settings.mochiApiKey) setSavedMochiApiKey(settings.mochiApiKey);
+        if (settings.mochiDeckId) setSavedMochiDeckId(settings.mochiDeckId);
+      })
+      .catch(() => {
+        // Non-fatal: user can still enter credentials manually.
+      });
+    refreshHistory();
+  }, [isSignedIn, refreshHistory]);
   const [, uploadAction, uploadIsPending] = useActionState(
     async (_: undefined, selectedTranslationsToUpload: Translation[]) => {
       try {
@@ -79,16 +124,19 @@ export const Tradu = () => {
   const [translationResponse, searchAction, searchIsPending] = useActionState(
     async (_previousState: Translation[], formData: FormData) => {
       const term = formData.get("term");
+      // Direction is submitted with the form so programmatic searches (e.g.
+      // re-running a history entry) use the right direction without relying
+      // on the latest render's `translationDirection` closure.
+      const formDirection = formData.get("direction");
+      const direction =
+        typeof formDirection === "string" ? formDirection : translationDirection;
       if (typeof term !== "string") {
         return [];
       } else {
         setSearchTerm(term);
         let translationResults: Translation[];
         try {
-          translationResults = await getTranslations(
-            translationDirection,
-            term,
-          );
+          translationResults = await getTranslations(direction, term);
         } catch (err) {
           if (err instanceof RateLimitError) {
             toast.warning("Too fast! Slow down!");
@@ -101,6 +149,9 @@ export const Tradu = () => {
         }
         setSelectedTranslationIds(new Set());
         setModifiedTranslations(translationResults);
+        if (isSignedIn) {
+          recordSearch(term, direction).then(refreshHistory);
+        }
         return translationResults;
       }
     },
@@ -111,6 +162,15 @@ export const Tradu = () => {
     setSavedMochiDeckId(newMochiDeckId);
     setSettingsOpen(false);
   };
+  const onSelectHistory = (word: string, direction: string) => {
+    setTranslationDirection(direction);
+    const formData = new FormData();
+    formData.set("term", word);
+    formData.set("direction", direction);
+    // searchAction is a useActionState dispatch; must run inside a transition
+    // when invoked directly (rather than via a form action prop).
+    startTransition(() => searchAction(formData));
+  };
   return (
     <div className="max-w-7xl w-full mx-auto flex flex-col gap-4 flex-1 min-h-0">
       <div className="shrink-0">
@@ -119,6 +179,9 @@ export const Tradu = () => {
           loading={searchIsPending}
           translationDirection={translationDirection}
           setTranslationDirection={setTranslationDirection}
+          user={session?.user ?? null}
+          searchHistory={searchHistory}
+          onSelectHistory={onSelectHistory}
         />
       </div>
       <div className="flex-1 min-h-0 overflow-hidden">

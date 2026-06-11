@@ -8,7 +8,7 @@ import {
 } from "@dnd-kit/core";
 import { CardDropZone } from "./CardDropZone";
 import { TranslationCard } from "./TranslationCard";
-import { useState } from "react";
+import { startTransition, useState } from "react";
 import { Translation } from "@/services/mochiApi";
 import { BookOpen } from "lucide-react";
 
@@ -136,9 +136,13 @@ export const ResultsSpace = ({
           id="to"
           header="Cards to Make"
           uploadCards={() =>
-            uploadAction(
-              modifiedTranslations.filter((translation) =>
-                selectedTranslationIds.has(translation.translation_id),
+            // uploadAction is a useActionState dispatch; wrap in a transition
+            // since it's invoked directly rather than via a form action prop.
+            startTransition(() =>
+              uploadAction(
+                modifiedTranslations.filter((translation) =>
+                  selectedTranslationIds.has(translation.translation_id),
+                ),
               ),
             )
           }
